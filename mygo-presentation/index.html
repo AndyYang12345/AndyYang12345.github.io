@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyGo —— 基于 ROS 2 的全自主移动操作机器人</title>
+<title>MyGo —— 基于 ROS 2 的半自主移动操作机器人</title>
 <style>
 :root {
   --bg: #000000;
@@ -477,12 +477,51 @@ video {
   .two-col, .two-col.wide-left, .two-col.wide-right {
     grid-template-columns: 1fr;
   }
+  .cover-layout {
+    grid-template-columns: 1fr;
+    gap: 1em;
+  }
+  .cover-video {
+    max-height: 35vh;
+  }
+  .cover-right {
+    text-align: center;
+  }
   .card-grid.two, .card-grid.three { grid-template-columns: 1fr; }
   .dots-nav { right: 1vw; }
   .slide { padding: 4vh 5vw; }
 }
 
-/* ===== Video background cover ===== */
+/* ===== Cover Video (两栏封面) ===== */
+.cover-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5em;
+  align-items: center;
+  width: 100%;
+}
+
+.cover-video {
+  width: 100%;
+  max-height: 55vh;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.cover-video:hover {
+  border-color: var(--title);
+}
+
+.cover-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ===== Video background cover (保留用于其他场景) ===== */
 .video-cover {
   position: absolute;
   inset: 0;
@@ -536,33 +575,43 @@ pre code {
 
 <!-- ============ SLIDE 1: 封面 ============ -->
 <div class="slide active" data-index="0">
-  <video class="video-cover" autoplay muted loop playsinline>
-    <source src="小车完整形态功能演示-配合UI.mp4" type="video/mp4">
-  </video>
-  <div class="anim">
-    <div class="cover-tag">MYGO · 开源报告会</div>
-  </div>
-  <div class="anim">
-    <h1>MyGo</h1>
-  </div>
-  <div class="anim">
-    <p class="cover-subtitle">基于 ROS 2 的全自主移动操作机器人</p>
-  </div>
-  <div class="anim">
-    <p class="muted" style="margin-top:0.5em;">底盘运动 · 五轴机械臂 · 视觉锁定 · 能量机关全流程自主操作</p>
-  </div>
-  <div class="anim">
-    <div class="cover-meta">
-      <span class="badge purple">ROS 2 Jazzy</span>
-      <span class="badge accent">C++ 17</span>
-      <span class="badge">OpenCV 4.x</span>
-      <span class="badge">MoveIt 2</span>
-      <span class="badge purple">嵌入式</span>
-      <span class="badge accent">2026年5月</span>
+  <div class="cover-layout">
+    <!-- 左侧：完整演示视频（点击播放） -->
+    <div class="anim">
+      <video class="cover-video" controls muted preload="metadata" playsinline>
+        <source src="小车完整形态功能演示-配合UI.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+      </video>
+      <p class="media-caption" style="margin-top:0.4em; text-align:center;">▲ 点击播放查看完整功能演示</p>
     </div>
-  </div>
-  <div class="anim">
-    <p class="muted" style="margin-top:2em;">MyGo 团队视觉负责人 · Harekasa</p>
+    <!-- 右侧：标题与信息 -->
+    <div class="cover-right">
+      <div class="anim">
+        <div class="cover-tag">MYGO · 开源报告会</div>
+      </div>
+      <div class="anim">
+        <h1>MyGo</h1>
+      </div>
+      <div class="anim">
+        <p class="cover-subtitle">基于 ROS 2 的半自主移动操作机器人</p>
+      </div>
+      <div class="anim">
+        <p class="muted" style="margin-top:0.5em;">底盘运动 · 五轴机械臂 · 视觉锁定 · 能量机关全流程自主操作</p>
+      </div>
+      <div class="anim">
+        <div class="cover-meta">
+          <span class="badge purple">ROS 2 Jazzy</span>
+          <span class="badge accent">C++ 17</span>
+          <span class="badge">OpenCV 4.x</span>
+          <span class="badge">MoveIt 2</span>
+          <span class="badge purple">嵌入式</span>
+          <span class="badge accent">2026年5月</span>
+        </div>
+      </div>
+      <div class="anim">
+        <p class="muted" style="margin-top:2em;">MyGo 团队视觉负责人 · Harekasa</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -574,12 +623,12 @@ pre code {
   <div class="two-col wide-left anim">
     <div>
       <div class="highlight-bar">
-        <p>面向 RoboMaster 竞赛场景的全自主移动操作平台，实现<strong style="color:var(--accent)">底盘运动</strong>、<strong style="color:var(--accent)">机械臂抓取</strong>、<strong style="color:var(--accent)">能量机关收集与提交</strong>等复杂任务。</p>
+        <p>面向 RoboMaster 竞赛场景的半自主移动操作平台，实现<strong style="color:var(--accent)">底盘运动</strong>、<strong style="color:var(--accent)">机械臂抓取</strong>、<strong style="color:var(--accent)">能量机关收集与提交</strong>等复杂任务。</p>
       </div>
       <ul class="bullet-list" style="margin-top:1em;">
         <li>轮式差分驱动底盘 + 5-DOF 机械臂 + 两指对称夹爪 + 可旋转回收杆</li>
         <li>ROS 2 Jazzy 分布式架构，真机部署 Raspberry Pi 4B + STM32</li>
-        <li>手柄遥控 + 视觉辅助双模融合，半自主/全自主任务执行</li>
+        <li>手柄遥控 + 视觉辅助双模融合，半自主任务执行</li>
         <li>独立视觉模块，基于 MaixCam2 嵌入式平台，仿真预研后再上实机</li>
       </ul>
     </div>
@@ -624,7 +673,7 @@ pre code {
     <div class="card-grid three">
       <div class="card">
         <h3>🎯 分层解耦</h3>
-        <p>每层独立可测，数据通过标准化接口传递，视觉模块仅用 cv::Mat 与主控通信</p>
+        <p>每层独立可测，数据通过标准化接口传递，视觉模块独立运行，通过 TCP 与主控通信</p>
       </div>
       <div class="card">
         <h3>🔄 状态驱动</h3>
@@ -662,6 +711,7 @@ pre code {
         <tr><td style="color:var(--accent)">CHASSIS</td><td>底盘模式 + 8子模式</td></tr>
         <tr><td style="color:var(--accent)">ARM</td><td>摇杆XYZ + 夹爪 + 预设动作</td></tr>
         <tr><td style="color:var(--accent)">MENU</td><td>摇杆导航 + 扳机确认</td></tr>
+        <tr><td style="color:var(--accent)">POLE</td><td>回收杆模式，扳机控制旋转</td></tr>
         <tr><td style="color:var(--accent)">VISION</td><td>视觉锁定辅助操控</td></tr>
         <tr><td style="color:var(--accent)">EMERGENCY</td><td>立即刹停所有执行器</td></tr>
       </table>
@@ -695,7 +745,7 @@ pre code {
           <li>2-DOF 对称 mimic 夹爪</li>
           <li>差分驱动轮式底盘</li>
           <li>STL 网格碰撞模型</li>
-          <li>Gazebo + ros2_control 仿真就绪</li>
+          <li>RViz2 + ros2_control 仿真就绪</li>
         </ul>
       </div>
       <div class="card">
@@ -933,7 +983,7 @@ pre code {
     </div>
     <div class="card">
       <h3>🎮 仿真可视化</h3>
-      <p>Gazebo · RViz2 · Xacro/URDF · STL 网格</p>
+      <p>RViz2 · Xacro/URDF · STL 网格</p>
     </div>
     <div class="card">
       <h3>👁️ 视觉算法</h3>
@@ -941,7 +991,7 @@ pre code {
     </div>
     <div class="card">
       <h3>🔌 底层通信</h3>
-      <p>Linux termios · STM32 · MaixCam2 · 蓝牙桥接 · sensor_msgs/Joy</p>
+      <p>USB串口 (termios) · STM32 · MaixCam2 · TCP 通信 · sensor_msgs/Joy</p>
     </div>
     <div class="card">
       <h3>🖥️ 工程化</h3>
