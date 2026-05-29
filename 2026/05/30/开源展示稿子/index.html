@@ -1,0 +1,193 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>开源展示稿子 | Ciallo(∠・ω&lt; )⌒☆</title><meta name="author" content="Harekasa"><meta name="copyright" content="Harekasa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F5F0FF"><meta name="description" content="开源大会稿子1. 项目总览 大家好我是______，我是MyG0战队的视觉负责人，负责搭建ROS2上位机框架和视觉任务实现。这里是一个简单的演示，展示了我们的上位机UI和手柄控制的流程。 （展示视频） 通过视频可以看到，我们通过ROS2自带的joynode节点和joy信息接口，结合自己编写的抽象封装和有限状态机，通过管理状态机变化实现机器人功能的完整控制链路，本着高解耦高集成的设计理念，我们将所有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源展示稿子">
+<meta property="og:url" content="http://example.com/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/index.html">
+<meta property="og:site_name" content="Ciallo(∠・ω&lt; )⌒☆">
+<meta property="og:description" content="开源大会稿子1. 项目总览 大家好我是______，我是MyG0战队的视觉负责人，负责搭建ROS2上位机框架和视觉任务实现。这里是一个简单的演示，展示了我们的上位机UI和手柄控制的流程。 （展示视频） 通过视频可以看到，我们通过ROS2自带的joynode节点和joy信息接口，结合自己编写的抽象封装和有限状态机，通过管理状态机变化实现机器人功能的完整控制链路，本着高解耦高集成的设计理念，我们将所有">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/github-profile.png">
+<meta property="article:published_time" content="2026-05-29T17:28:23.000Z">
+<meta property="article:modified_time" content="2026-05-29T17:28:37.430Z">
+<meta property="article:author" content="Harekasa">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/github-profile.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "开源展示稿子",
+  "url": "http://example.com/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/",
+  "image": "http://example.com/img/github-profile.png",
+  "datePublished": "2026-05-29T17:28:23.000Z",
+  "dateModified": "2026-05-29T17:28:37.430Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harekasa",
+      "url": "https://github.com/AndyYang12345"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/prts-512x512.png"><link rel="canonical" href="http://example.com/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A2438')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F5F0FF')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '开源展示稿子',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_image.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Ciallo(∠・ω&lt; )⌒☆</span></a><a class="nav-page-title" href="/"><span class="site-name">开源展示稿子</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">开源展示稿子</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-05-29T17:28:23.000Z" title="Created 2026-05-30 01:28:23">2026-05-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-05-29T17:28:37.430Z" title="Updated 2026-05-30 01:28:37">2026-05-30</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">4.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>13mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="开源大会稿子"><a href="#开源大会稿子" class="headerlink" title="开源大会稿子"></a>开源大会稿子</h1><h2 id="1-项目总览"><a href="#1-项目总览" class="headerlink" title="1. 项目总览"></a>1. 项目总览</h2><ul>
+<li>大家好我是______，我是MyG0战队的视觉负责人，负责搭建ROS2上位机框架和视觉任务实现。这里是一个简单的演示，展示了我们的上位机UI和手柄控制的流程。</li>
+<li>（展示视频）</li>
+<li>通过视频可以看到，我们通过ROS2自带的joynode节点和joy信息接口，结合自己编写的抽象封装和有限状态机，通过管理状态机变化实现机器人功能的完整控制链路，本着高解耦高集成的设计理念，我们将所有复杂操作用类《终末地》的派状UI进行控制，实现了底盘运动控制、机械臂控制、车载特殊机构控制等功能的完整实现，以及视觉接口。视觉板块在后续会进行展示，大体是采用了基于OpenCV的传统视觉识别方案，在PC端进行完整仿真测试之后用Sipeed的MaixCDK进行Maixcam2平台的交叉编译，最后在相机端实现完整识别、追踪指令下发等操作，通过TCP网络协议与上位机树莓派进行通信，再通过硬件接口下发到云台驱动。</li>
+<li>这里是我们项目技术栈的一个总览，我们为了解决起伏路段问题，专门选用履带作为底盘行进机构，用两侧速度差分实现转向等操作。机械臂采用5DOF的机械臂，采用总线舵机进行控制，并在上部的pitch轴处通过自己设计的打印件连接了Maixcam2相机模块。车载模块选用针对性特化的两个旋杆，通过精细操作快速收集平台上的能量单元；还有可抬升小球收集装置，在上午已经展示过。上位机采用树莓派4B,底盘驱动采用Stm32f407ZET6，机械臂和车载机构用Stm32f103C8T6进行控制，驱动版均由我们的队长绘制，实现了USB模拟串口，采用USB线进行连接，大幅提升连接和通信稳定性。上位机搭建的ROS2框架配置了开机自启，通过串口绑定下位机stm芯片编号，实现乱序连接的自动识别和功能分配，给整车的调试提供了便利。基于ROS2的通信机制，在树莓派启动的主节点可以通过话题信息向局域网广播，在同一局域网下的PC端可以运行UI界面通过对当前状态的实时读取并反馈给操作手，实现了可视化控制和状态监测的功能，也能反应视觉模块的连接状况等。</li>
+<li>（展示节点拓扑图）</li>
+<li>（展示架构设计）</li>
+<li>（展示状态机设计）</li>
+<li>接下来我详细解释一下我们上位机的架构设计。我们的架构可以大致表示为这样的一个流程：先从ROS2的joy_node节点捕获裸手柄数据，这是符合xinput的标准手柄输入，但是暂时难以进行解读，需要进行手动二次封装和抽象。在通过joystick_parser之后，裸数据被解析成高级指令，比如简单的摇杆坐标、按键触发（已经映射后的）以及复合命令比如双扳机同时扣下表示确认等（这点是模仿终末地中双扳机确认滑索目标的功能）。接着通过核心决策节点，通过状态机的指令下发，对应触发当前状态所需的回调函数等。处理后的决策信息比如舵机角度等会发送到硬件驱动节点，再经过和电控对接后确认的指令的转换，下发到对应的硬件通信接口，比如说高级决策通过左摇杆向前，推算需要前进velocity，然后通过更新geometry_msgs&#x2F;msg&#x2F;Twist数据并下发到硬件接口节点，硬件接口接着根据前进速度或者转弯速度映射到两侧的差速，最后根据和我们的底盘电控沟通好的控制指令，下发形如#0.23,0.33的指令，最后底盘驱动通过USB模拟串口接收到请求，修改当前转速，实现实时速度控制。</li>
+<li>首先，基于我们队对控制的需求，我进行了功能的整合以及调研，在对信息的分类和功能的分划之后，我决定使用有限状态机进行状态管理，然后采用我本人很喜欢的游戏终末地里的饼状功能选择作为切换入口。通过设计一个状态机节点，维护了当前状态和状态节点的基类，并派生了一些需要使用的功能，用纯虚类初始化了必要的操作，实现在回调中根据当前状态实时激活正确回调函数的功能。然后在每个状态类的实现中对OnEnter、OnExit、OnUpdate等函数进行重写，实现了针对性的功能。通过在主节点维护一个状态指针，以及所有状态的实例，当状态切换的时候，操作指针指向对应的状态实例，这样子就可以在主节点中的订阅回调中正确触发所需的功能。比方说当前处于机械臂模式，如果进入这个模式就触发OnEnter，可以输出一些提示信息，然后当收到手柄抽象指令，比方说左摇杆的坐标指令，就对应修改某个舵机的角度。同理当指针指向底盘模式，信息订阅回调就会触发底盘速度的映射，也对应将速度下发到对应话题，接着在对应的硬件接口节点进行后续解析和串口下发。我的设计可以在保证最大程度上解耦的前提下实现完整功能和很好的拓展性，需要添加功能只需要向主节点注册对应的节点名称并实例化，对应实现状态的类和函数即可。</li>
+<li>还有一个比较重要的是视觉通信的接口设计。最开始我们专门选用总线舵机作为机械臂的控制方案，为的就是通过相机上的串口直接控制舵机旋转，但是在实际测试后，发现由于电压不匹配等各种原因，导致相机并不能直接控制舵机，所以我们采用TCP网络协议，通过树莓派中转再下发到控制板。通过这个设计，我们还可以在上位机植入更便捷的调试接口，比如说在UI上提供是否连接上相机、当前视觉任务状况等信息的显示，由于和ROS2的更深层次的集成，我们得以在状态机中添加视觉状态，并直接实现手柄控制端的视觉任务启动等功能，极大提升了视觉模块的可用性和调试效率。在实际的操作中，我们在进入模式后，可以通过摇杆手动调整相机朝向，使得相机光心命中靶子，然后通过按键触发视觉任务的启动，完成自动追踪和指令下发的功能。</li>
+<li>接着是机械臂控制的思路，我学习了Moveit2的基本控制原理，通过我们机械队员提供的机械臂urdf文件，我实现了我方机械臂的精准建模和动作组配置，在上位机中可以通过调用moveit2接口，实现目标位置之间的运动学逆解算和轨迹控制，也就是说我们可以高精度地实现机械臂的运动控制和路径规划。由于懒得编写ros_control接口，我直接手动封装了机械臂硬件接口，直接解析路径信息，然后转化为当前时刻的舵机角度并打包下发至下位机，由于舵机选型的问题并不能实现客观意义上的闭环控制，但是由于总线舵机内部是自带角度闭环的，某种程度上也是能够保证最后角度的准确的。通过将控制接口集成到状态机的自菜单中，我们可以通过右肩键实现机械臂预设位置之间的切换，并且不同于传统的仅有始末位置的角度控制或是简单的轨迹插值，这个方案可以避免自身的干涉，并一定程度上实现路径的光滑化。这个方案还有一点需要改进的地方就是未能实现整车的仿真，本来是想将整车转化为urdf模型并在rviz或是gazebo中仿真，但是由于模型面数过高，在PC端运行还算可以，但是一旦在树莓派端进行部署，光是加载解算模型就会画1-2分钟启动，对使用和调试都是一个问题，最后还是只保留了机械臂部分和必要的底座，这样子无法对真实情况进行仿真，也就说明可能出现机械臂路径和实车干涉，我们避免出现这个问题的方法就是让操作手尽可能让机械臂从最安全的位置进行运动。</li>
+<li>（展示视觉模块总览）</li>
+<li>这个是我的视觉模块总览，跟前面说的一样，本项目最开始在PC端进行构建，通过OpenCV实现了靶子的绘制和运动控制，通过传入lamda匿名角速度函数就可以改变靶面的样子。然后基于这个仿真编写了追踪类，实现了追踪算法的编写和测试，最后封装成追踪管线，只需要实例化一个追踪器然后传入图片就可以识别到目标位置。接着我编写了云台驱动和硬件通信接口等，在仿真阶段完成了全部链路的测试。</li>
+<li>（展示键盘控制仿真靶面和相机识别）</li>
+<li>（展示仿真层）</li>
+<li>可以看到这个是我用OpenCV绘制的靶子模型，通过创建靶子实例，传入颜色和位置就可以得到一个靶子图片。然后在这个基础上编写了一个流式帧生成器，通过维护一个自tick的生成器，通过向靶面类传入位置就可以生成旋转的靶子，通过编写角速度函数就可以得到对应旋转效果的靶面。在后续的测试中，我又通过将靶面映射在空间中，编写了仿真相机类，传入所使用的相机镜头内参，进行空间的仿真。通过这个仿真相机类，我们就可以在PC端进行完整的视觉算法测试，验证算法的正确性和鲁棒性。通过这个仿真环境，我还测试了视觉算法的性能，发现算法在PC端的运行效率是完全满足实时性的要求的，这也为后续在树莓派端的部署提供了信心。</li>
+<li>（展示视觉算法测试）</li>
+<li>追踪算法的实现是基于我的仿真测试出来的，在最开始的编写过程中，我简单地通过画面中所有色块的位置判定哪个在中间，然后读取色块颜色，通过所有色块的几何位置确定目标位置，再通过计算每个色块和中心色块的相似度来确定目标色块的位置。但是在测试中发现其鲁棒性其实很低，会出现相似颜色误判或是中心色块位置误判等情况，这分别是因为色彩相似度计算函数鲁棒性不高以及中心色块位置的确认思路还有待提升。于是我在这个基础上，对最容易识别错误的相似颜色进行了针对性优化：对所有颜色色块捕获其三色彩空间的数据，中心色块是亮色的情况下，提高BGR色彩空间相似度权重，使得融合权重函数更加相信BGR显现出来的区别；中心色块是暗色的情况下，提高HSV色彩空间相似度权重，这样就可以区分暗色之间的色相区别，同理LAB可以避免亮度带来的误识别问题。通过这个优化，算法的鲁棒性得到了明显提升，误判率大幅降低，能够更稳定地识别出目标位置。针对定位问题，我基于目标色块形状和中心色块形状的区别，通过圆形度来确认中心色块位置，结合对方形色块的数量统计，只有保证画面内存在5个周围色块，才开始识别，避免了中心色块位置误判导致的整个画面误判的问题。通过上述优化，算法的稳定性得到了进一步提升，能够更准确地识别出目标位置，并且在复杂环境下也能保持较好的性能。在后续的追踪部分，由于不能保证画面中出现完整靶子，我通过连续几帧识别到的目标确定了一个roi区域，以及通过对这个区域的卡尔曼滤波预测，进行一定程度上的跟踪，可以保证在不进行整体识别的情况下依然能够较为稳定地追踪到目标位置。</li>
+<li>（展示追踪）</li>
+<li>追踪部分基于上述的roi以及云台驱动等，最开始我采用简单粗暴的像素误差到pitch&#x2F;yaw角度变化量的PID控制来实现追踪。这个控制策略对识别精度和控制精度要求很高，最终无法实现高效的追踪。再后来我采用了一个有点过拟合的控制策略，通过靶面外参和相机内参进行单目测距，然后结合靶面周围色块到中心色块的半径，得到相机相对圆心所需要进行的旋转角度，通过维护一个旋转运算函数，我可以和我的仿真一样，通过传入速度函数实现开环的云台角度控制。在理想的情况下，相机应该沿着圆形轨迹始终跟随目标色块，至少是和目标色块保持一个固定的相对位置。接着我接入像素误差识别，控制角速度变化量，引入PID闭环，实现落后追赶、超前减速的跟随控制功能。这是一个委曲求全的策略，在理想情况下能够正确追踪，像视频里展示的这样，但是我没考虑到实际比赛环境，最终由于环境的复杂性和算法的鲁棒性问题，导致追踪效果不理想。由于车上空间很少，所以本来设置的一个云台位置被取消了，最终只能将相机固定在机械臂上，导致外参难以测定，控制也由于机械臂的运动导致滞后等问题。总的来说这个追踪方案并没有体现很好的工程学设计，也只有仿真和识别的编写能够体现一点技术含量，追踪和云台控制迫于现实问题，存在实在难以解决的物理问题，最终只能通过一些折衷的方案来实现，虽然在仿真中能够得到不错的效果，但是在实际环境中表现并不理想，这也是我觉得比较遗憾的一点。</li>
+<li>（展示遗传训练）</li>
+<li>在仿真阶段，我提出了用遗传算法进行PID训练的想法，并简单编写了这么一个模板，通过初始化一些样本、编写适应性函数、交叉变异等操作，实现PID参数的自动调优。由于本人一直停留在软件层面的开发，直到后面才有就会实践PID的调参过程，我误以为PID适应于所有过程，用软件仿真的结果也会适应实际控制过程，但是在实际控制中完全不是这样。仿真出来的PID只能作为一个参考，实际调参还是需要人为迭代。在完整形态考核任务中，我通过这个接口进行了简单的测试，发现确实不适合于现实调参过程，遗传测试过程对适应性函数的编写要求很高，对突变因数、突变范围等参数的设置也很敏感，仿真测试只需要几秒就能运行完的迭代任务在实际过程中需要半个小时起步的时间，效率低下，最后还是放弃了这个方案，改为传统的人工调参，虽然效率不高但是更适合于实际的调参过程。</li>
+<li>以上是我本次想分享的内容，我通过ROS2上位机的构建，实现了一个易于拓展、易于维护的控制框架，通过有限状态机的设计实现了功能的整合和解耦，通过视觉接口的设计实现了视觉模块的高效集成，通过机械臂控制的实现实现了高精度的机械臂控制，通过追踪算法的编写实现了目标追踪功能，虽然在实际环境中表现不理想，但是在仿真环境中得到了不错的效果。最后我也分享了一些在开发过程中遇到的问题和解决方案，希望能够对大家有所启发。谢谢大家！</li>
+<li>全部项目已开源在github，欢迎大家访问和交流。<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/mygo_ros.git">ROS 2 上位机</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/mygo_via_maixcdk.git">基于MaixCDK开发的视觉模块</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/MygoVison.git">PC端仿真环境</a></li>
+<li><a target="_blank" rel="noopener" href="https://andyyang12345.github.io/">个人博客</a></li>
+</ul>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://github.com/AndyYang12345">Harekasa</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/">http://example.com/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/github-profile.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/05/25/%E7%AD%94%E8%BE%A9%E7%A8%BF%E5%AD%90/" title="答辩稿子"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">答辩稿子</div></div><div class="info-2"><div class="info-item-1">华南虎视觉组梯队任务姓名：______ 一些可能问到的问题 你觉得这个项目的难点在哪里？你是怎么克服这些难点的？ 感觉主要难在对行为树编写逻辑的理解上，就是在接触一个全新技术栈的时候肯定会经历的一个流程，一开始完全不理解这个的设计原理和实现手段，就一点一点生啃教程和源码，先从学长的汉化版开始，然后再结合AI,在基本理解实现流程之后配合源码食用。感觉对我理解帮助最大的还是AI的辅助，我存在不懂的地方直接向它提问即可，大概在三个小时内就把行为树的逻辑梳理下来了，当然这也是我最头疼的三个小时。 在这段时间内，我理清了行为树的设计理念和具体代码实现，这种对面向对象的设计模式有点颠覆我的代码思维，让我深刻地感受到C++的强大和灵活。在此基础上，我知道了怎么去自己编写自己的动作节点和条件节点，然后怎么通过xml去构建一个树。 我觉得最重要的一个知识点就是行为树的黑板设计以及tick的实现了。行为树主节点通过注册子节点，用xml文件串联树的结构，在必要的时候实例化对象并根据前一个节点的状态传递tick指令，从代码上看其实就是通过调用被覆写的tick函数来实现的；而黑板则是一个内部共享的内存空间...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harekasa</div><div class="author-info-description">Harekasa的个人博客，分享技术、生活和兴趣爱好。</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/andyyang12345"><i class="fab fa-github"></i><span>OMG its me  !</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/AndyYang12345" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:eeysy_harekasa@mail.scut.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%80%E6%BA%90%E5%A4%A7%E4%BC%9A%E7%A8%BF%E5%AD%90"><span class="toc-number">1.</span> <span class="toc-text">开源大会稿子</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%A1%B9%E7%9B%AE%E6%80%BB%E8%A7%88"><span class="toc-number">1.1.</span> <span class="toc-text">1. 项目总览</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/" title="开源展示稿子">开源展示稿子</a><time datetime="2026-05-29T17:28:23.000Z" title="Created 2026-05-30 01:28:23">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/25/%E7%AD%94%E8%BE%A9%E7%A8%BF%E5%AD%90/" title="答辩稿子">答辩稿子</a><time datetime="2026-05-25T05:04:41.000Z" title="Created 2026-05-25 13:04:41">2026-05-25</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/28/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E5%9C%A8VSCode%E7%8E%AF%E5%A2%83%E5%9F%BA%E4%BA%8ESTM32Cube%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8DapLink%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95%E7%9A%84%E7%A0%94%E7%A9%B6/" title="关于如何在VSCode环境基于STM32Cube插件使用DapLink进行调试的研究">关于如何在VSCode环境基于STM32Cube插件使用DapLink进行调试的研究</a><time datetime="2026-04-28T08:04:27.000Z" title="Created 2026-04-28 16:04:27">2026-04-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/05/%E8%A1%8C%E4%B8%BA%E6%A0%91/" title="行为树">行为树</a><time datetime="2026-04-05T03:32:36.000Z" title="Created 2026-04-05 11:32:36">2026-04-05</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/top_image.jpg);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harekasa</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div><div class="footer_custom_text">我始终如一 ~</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Toggle Between Traditional and Simplified Chinese">繁</button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><script src="/js/TabName.js"></script><script src="/js/tag-colorizer.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="80" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
