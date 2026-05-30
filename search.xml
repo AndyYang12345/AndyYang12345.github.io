@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>GPT-SoVits的部署</title>
+      <link href="/2026/05/30/GPT-SoVits%E7%9A%84%E9%83%A8%E7%BD%B2/"/>
+      <url>/2026/05/30/GPT-SoVits%E7%9A%84%E9%83%A8%E7%BD%B2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="GPT-SoVits的部署"><a href="#GPT-SoVits的部署" class="headerlink" title="GPT-SoVits的部署"></a>GPT-SoVits的部署</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近终于有时间做一直想做的tts服务器项目了，暂时现在本地部署一下，测试下效果，之后会部署在云GPU服务器上，提供API服务。<br>这篇文章就用来整理一下部署的过程，希望能给读者一点参考。</p><h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>本次部署在Ubuntu24.04系统上进行，在官方github仓库可以看到快速启动的部署指令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conda create -n GPTSoVits python=3.10</span><br><span class="line">conda activate GPTSoVits</span><br><span class="line">bash install.sh --device &lt;CU126|CU128|ROCM|CPU&gt; --<span class="built_in">source</span> &lt;HF|HF-Mirror|ModelScope&gt; [--download-uvr5]</span><br></pre></td></tr></table></figure><p>按照这个指令，首先创建了一个新的conda环境，安装了python3.10，然后运行安装脚本，选择了对应的设备和模型源，等待安装完成。本机在RTX5060平台安装，选择了CU128和HF-Mirror，安装过程大约花了20分钟左右，期间会下载模型文件和安装依赖包。注意到经常容易出现网络连接问题，必要依赖可以手动下载，然后在脚本中跳过。<br>在实际依赖安装过程中，我的apt源中有一个过期仓库导致更新堵塞，还一直以为是网络问题，直到后来修复之后才正常下载成功。<br>install.sh会在虚拟环境中安装必要的python依赖和预编译模型，是启动程序必要的操作，也可以根据官方教程手动安装模型到正确目录。<br><em>暂未测试其他安装方法或是docker部署，过程中出现了一点点小问题，后续部署成功或许会有别的文章。</em></p><h2 id="启动测试"><a href="#启动测试" class="headerlink" title="启动测试"></a>启动测试</h2><p>一定要注意！！官方install脚本安装的gradio版本有点落后，会报传参错误，需要手动升级gradio和gradio-client到最新版本，才能正常启动。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install --upgrade gradio gradio-client</span><br></pre></td></tr></table></figure><p>升级完成后应该就可以使用以下指令启动了：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python webui.py</span><br><span class="line"><span class="comment"># 或者指定在公网开放使用--share</span></span><br><span class="line">python webui.py --share</span><br></pre></td></tr></table></figure><p>然后就可以浏览器访问自动打开的链接进行语音模型训练和推理了，后续会使用提供的推理接口进行API服务的搭建，提供在线的语音合成服务。请期待后续的文章！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 后端 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> GPT-SoVits </tag>
+            
+            <tag> 环境部署 </tag>
+            
+            <tag> 服务器搭建 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>开源展示稿子</title>
       <link href="/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/"/>
       <url>/2026/05/30/%E5%BC%80%E6%BA%90%E5%B1%95%E7%A4%BA%E7%A8%BF%E5%AD%90/</url>
@@ -79,17 +108,6 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
@@ -101,11 +119,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/tag-colorizer.js"/>
-      <url>/js/tag-colorizer.js</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[/** * 标签颜色分配器 - 淡雅紫色系（完全随机版） * 每次刷新页面，标签颜色都会重新随机分配 */(function() {    'use strict';    // ============================================    // 配色方案：淡雅紫色系（高对比度，颜色差异明显）    // ============================================    const colorPalette = [        '#F5F0FF',  // 极淡紫白（近乎白色）        '#EBE0FA',  // 浅紫白        '#DDCCF5',  // 薰衣草白        '#CFB8F0',  // 淡紫丁香        '#C1A4EB',  // 浅紫罗兰        '#B390E6',  // 紫罗兰        '#A57CE0',  // 淡绮罗紫        '#9768DB',  // 紫藤色        '#8954D6',  // 中紫色        '#7B40D0',  // 较深紫        '#6D2CCB',  // 深紫色        '#5F18C6'   // 紫罗兰深    ];    // 深色背景的文字颜色阈值    const DARK_THRESHOLD = 140;    // ============================================    // 工具函数    // ============================================    /**     * 随机打乱数组（Fisher-Yates 洗牌算法）     */    function shuffleArray(arr) {        const array = [...arr];        for (let i = array.length - 1; i > 0; i--) {            const j = Math.floor(Math.random() * (i + 1));            [array[i], array[j]] = [array[j], array[i]];        }        return array;    }    /**     * 从色表中随机选取指定数量的颜色     * @param {number} count - 需要的颜色数量     * @returns {Array} 随机颜色数组     */    function getRandomColors(count) {        // 如果颜色不够用，就重复使用色表        if (count <= colorPalette.length) {            // 随机打乱后取前 count 个            const shuffled = shuffleArray(colorPalette);            return shuffled.slice(0, count);        } else {            // 标签数量超过色表，需要重复使用颜色            const result = [];            for (let i = 0; i < count; i++) {                const randomIndex = Math.floor(Math.random() * colorPalette.length);                result.push(colorPalette[randomIndex]);            }            return result;        }    }    /**     * 根据背景色判断文字颜色     */    function getTextColor(bgColor) {        const r = parseInt(bgColor.slice(1, 3), 16);        const g = parseInt(bgColor.slice(3, 5), 16);        const b = parseInt(bgColor.slice(5, 7), 16);        const brightness = (r * 299 + g * 587 + b * 114) / 1000;                if (brightness > DARK_THRESHOLD) {            return '#4A2A7A';  // 深紫色文字        } else {            return '#FFFFFF';  // 白色文字        }    }    /**     * 判断是否为浅色背景（用于添加边框）     */    function isLightColor(bgColor) {        const r = parseInt(bgColor.slice(1, 3), 16);        const g = parseInt(bgColor.slice(3, 5), 16);        const b = parseInt(bgColor.slice(5, 7), 16);        const brightness = (r * 299 + g * 587 + b * 114) / 1000;        return brightness > DARK_THRESHOLD;    }    function getTagElements() {        const selectors = [            '.tag-cloud-list a',           // 标签云页面            '.tag-cloud-tags a',           // 标签云（另一种）            '.post-tags a',                // 文章内页标签            '.card-tag-cloud a',           // 侧边栏标签卡片            '.tag-list a'                  // 其他可能的位置        ];                let allTags = [];        selectors.forEach(selector => {            const elements = document.querySelectorAll(selector);            if (elements.length) {                allTags = [...allTags, ...elements];            }        });                return allTags;    }    function applyTagColors() {        const tags = getTagElements();                if (!tags.length) {            console.log('[Tag Colorizer] 未找到标签元素');            return;        }                // 关键改动：随机为每个标签分配颜色        // 为每个标签单独随机选择一个颜色        tags.forEach(tag => {            // 随机从色表中选一个颜色            const randomIndex = Math.floor(Math.random() * colorPalette.length);            const bgColor = colorPalette[randomIndex];            const textColor = getTextColor(bgColor);            const isLight = isLightColor(bgColor);            const originalFontSize = tag.style.fontSize;                        // 浅色背景加细边框，深色背景不加            const borderStyle = isLight ? `border: 1px solid ${bgColor} !important;` : 'border: none !important;';                        // 应用样式            tag.setAttribute('style',                 `background-color: ${bgColor} !important; ` +                `color: ${textColor} !important; ` +                `display: inline-block !important; ` +                `padding: 4px 14px !important; ` +                `margin: 4px 6px !important; ` +                `border-radius: 24px !important; ` +                `text-decoration: none !important; ` +                `transition: all 0.25s ease !important; ` +                `${borderStyle} ` +                `font-size: ${originalFontSize || '1em'} !important; ` +                `box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;`            );                        // 悬浮效果            tag.addEventListener('mouseenter', function() {                this.style.opacity = '0.85';                this.style.transform = 'translateY(-2px)';                this.style.boxShadow = '0 4px 12px rgba(101, 48, 184, 0.2)';            });                        tag.addEventListener('mouseleave', function() {                this.style.opacity = '1';                this.style.transform = 'translateY(0)';                this.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';            });        });                console.log(`[Tag Colorizer] 已为 ${tags.length} 个标签随机分配紫色系配色`);    }    // 等待 DOM 加载    if (document.readyState === 'loading') {        document.addEventListener('DOMContentLoaded', applyTagColors);    } else {        applyTagColors();    }        // 监听 PJAX    document.addEventListener('pjax:complete', applyTagColors);})();]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -117,6 +135,17 @@
       <url>/js/TabName.js</url>
       
         <content type="html"><![CDATA[// TabName(function() {    'use strict';    // ========== 配置区域（按需修改）==========    const config = {        // 用户离开时显示的标题（随机显示）        leaveMessages: [            '这里万籁俱寂……太安静了。别留下我。'        ],        // 用户回来时显示的标题（可选，留空则恢复原标题）        returnMessage: '我知道我们会再次相见',        // 检查频率（毫秒），建议不要改太小        checkInterval: 200,        // 是否启用控制台输出（调试用）        debug: false    };    // ========== 配置结束 ==========    let originalTitle = document.title;    let timer = null;    let isAway = false;    function log(msg) {        if (config.debug) console.log('[FunnyTitle]', msg);    }    function setTitle(title) {        document.title = title;        log('标题已更改为: ' + title);    }    // 获取随机离开信息    function getRandomLeaveMessage() {        if (!config.leaveMessages.length) return '🔙 快回来吧~';        const randomIndex = Math.floor(Math.random() * config.leaveMessages.length);        return config.leaveMessages[randomIndex];    }    // 页面可见性变化处理    function handleVisibilityChange() {        if (document.hidden) {            // 用户离开页面            if (!isAway) {                isAway = true;                const leaveMsg = getRandomLeaveMessage();                setTitle(leaveMsg);                log('检测到用户离开页面');            }        } else {            // 用户回来            if (isAway) {                isAway = false;                const newTitle = config.returnMessage ? config.returnMessage : originalTitle;                setTitle(newTitle);                log('检测到用户回来');                // 延时恢复原标题（optional）                if (config.returnMessage) {                    setTimeout(() => {                        if (!document.hidden) {                            setTitle(originalTitle);                        }                    }, 1500);                }            }        }    }    // 获取原始标题（防止后续被修改）    function getOriginalTitle() {        return document.title;    }    // 主动检查焦点（兼容性增强）    function checkFocus() {        if (!document.hasFocus && !document.hidden) return;        if (document.hasFocus && document.hasFocus()) {            if (isAway) {                isAway = false;                setTitle(originalTitle);                log('通过焦点检测到用户回来');            }        }    }    // 初始化    function init() {        originalTitle = getOriginalTitle();        log('初始化完成，原始标题：' + originalTitle);        // 监听页面可见性变化（现代浏览器标准方式）        document.addEventListener('visibilitychange', handleVisibilityChange);        // 备用：监听窗口焦点        window.addEventListener('focus', function() {            if (isAway && !document.hidden) {                isAway = false;                setTitle(originalTitle);                log('通过窗口焦点检测到用户回来');            }        });        window.addEventListener('blur', function() {            if (!isAway && document.hidden === undefined) {                // 对于不支持 visibility API 的老旧浏览器                isAway = true;                setTitle(getRandomLeaveMessage());                log('窗口失去焦点');            }        });        // 定期检查（可选，增加可靠性）        if (config.checkInterval > 0) {            setInterval(checkFocus, config.checkInterval);        }    }    // 如果页面已加载完成则立即执行，否则等待    if (document.readyState === 'loading') {        document.addEventListener('DOMContentLoaded', init);    } else {        init();    }})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/tag-colorizer.js"/>
+      <url>/js/tag-colorizer.js</url>
+      
+        <content type="html"><![CDATA[/** * 标签颜色分配器 - 淡雅紫色系（完全随机版） * 每次刷新页面，标签颜色都会重新随机分配 */(function() {    'use strict';    // ============================================    // 配色方案：淡雅紫色系（高对比度，颜色差异明显）    // ============================================    const colorPalette = [        '#F5F0FF',  // 极淡紫白（近乎白色）        '#EBE0FA',  // 浅紫白        '#DDCCF5',  // 薰衣草白        '#CFB8F0',  // 淡紫丁香        '#C1A4EB',  // 浅紫罗兰        '#B390E6',  // 紫罗兰        '#A57CE0',  // 淡绮罗紫        '#9768DB',  // 紫藤色        '#8954D6',  // 中紫色        '#7B40D0',  // 较深紫        '#6D2CCB',  // 深紫色        '#5F18C6'   // 紫罗兰深    ];    // 深色背景的文字颜色阈值    const DARK_THRESHOLD = 140;    // ============================================    // 工具函数    // ============================================    /**     * 随机打乱数组（Fisher-Yates 洗牌算法）     */    function shuffleArray(arr) {        const array = [...arr];        for (let i = array.length - 1; i > 0; i--) {            const j = Math.floor(Math.random() * (i + 1));            [array[i], array[j]] = [array[j], array[i]];        }        return array;    }    /**     * 从色表中随机选取指定数量的颜色     * @param {number} count - 需要的颜色数量     * @returns {Array} 随机颜色数组     */    function getRandomColors(count) {        // 如果颜色不够用，就重复使用色表        if (count <= colorPalette.length) {            // 随机打乱后取前 count 个            const shuffled = shuffleArray(colorPalette);            return shuffled.slice(0, count);        } else {            // 标签数量超过色表，需要重复使用颜色            const result = [];            for (let i = 0; i < count; i++) {                const randomIndex = Math.floor(Math.random() * colorPalette.length);                result.push(colorPalette[randomIndex]);            }            return result;        }    }    /**     * 根据背景色判断文字颜色     */    function getTextColor(bgColor) {        const r = parseInt(bgColor.slice(1, 3), 16);        const g = parseInt(bgColor.slice(3, 5), 16);        const b = parseInt(bgColor.slice(5, 7), 16);        const brightness = (r * 299 + g * 587 + b * 114) / 1000;                if (brightness > DARK_THRESHOLD) {            return '#4A2A7A';  // 深紫色文字        } else {            return '#FFFFFF';  // 白色文字        }    }    /**     * 判断是否为浅色背景（用于添加边框）     */    function isLightColor(bgColor) {        const r = parseInt(bgColor.slice(1, 3), 16);        const g = parseInt(bgColor.slice(3, 5), 16);        const b = parseInt(bgColor.slice(5, 7), 16);        const brightness = (r * 299 + g * 587 + b * 114) / 1000;        return brightness > DARK_THRESHOLD;    }    function getTagElements() {        const selectors = [            '.tag-cloud-list a',           // 标签云页面            '.tag-cloud-tags a',           // 标签云（另一种）            '.post-tags a',                // 文章内页标签            '.card-tag-cloud a',           // 侧边栏标签卡片            '.tag-list a'                  // 其他可能的位置        ];                let allTags = [];        selectors.forEach(selector => {            const elements = document.querySelectorAll(selector);            if (elements.length) {                allTags = [...allTags, ...elements];            }        });                return allTags;    }    function applyTagColors() {        const tags = getTagElements();                if (!tags.length) {            console.log('[Tag Colorizer] 未找到标签元素');            return;        }                // 关键改动：随机为每个标签分配颜色        // 为每个标签单独随机选择一个颜色        tags.forEach(tag => {            // 随机从色表中选一个颜色            const randomIndex = Math.floor(Math.random() * colorPalette.length);            const bgColor = colorPalette[randomIndex];            const textColor = getTextColor(bgColor);            const isLight = isLightColor(bgColor);            const originalFontSize = tag.style.fontSize;                        // 浅色背景加细边框，深色背景不加            const borderStyle = isLight ? `border: 1px solid ${bgColor} !important;` : 'border: none !important;';                        // 应用样式            tag.setAttribute('style',                 `background-color: ${bgColor} !important; ` +                `color: ${textColor} !important; ` +                `display: inline-block !important; ` +                `padding: 4px 14px !important; ` +                `margin: 4px 6px !important; ` +                `border-radius: 24px !important; ` +                `text-decoration: none !important; ` +                `transition: all 0.25s ease !important; ` +                `${borderStyle} ` +                `font-size: ${originalFontSize || '1em'} !important; ` +                `box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;`            );                        // 悬浮效果            tag.addEventListener('mouseenter', function() {                this.style.opacity = '0.85';                this.style.transform = 'translateY(-2px)';                this.style.boxShadow = '0 4px 12px rgba(101, 48, 184, 0.2)';            });                        tag.addEventListener('mouseleave', function() {                this.style.opacity = '1';                this.style.transform = 'translateY(0)';                this.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';            });        });                console.log(`[Tag Colorizer] 已为 ${tags.length} 个标签随机分配紫色系配色`);    }    // 等待 DOM 加载    if (document.readyState === 'loading') {        document.addEventListener('DOMContentLoaded', applyTagColors);    } else {        applyTagColors();    }        // 监听 PJAX    document.addEventListener('pjax:complete', applyTagColors);})();]]></content>
       
     </entry>
     
@@ -145,9 +174,9 @@
     
     
     <entry>
-      <title>分类</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -156,9 +185,9 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>分类</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
