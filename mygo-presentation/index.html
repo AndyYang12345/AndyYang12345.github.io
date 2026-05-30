@@ -1008,7 +1008,7 @@ pre code {
       </div>
       <ul class="bullet-list" style="margin-top:1em;">
         <li><strong style="color:var(--accent)">履带式</strong>差分驱动底盘 + 5-DOF 总线舵机机械臂 + 双旋杆 + 可抬升小球收集装置</li>
-        <li>ROS 2 Jazzy 分布式架构，Raspberry Pi 4B + STM32F407(底盘) + STM32F103(机械臂/车载)</li>
+        <li>ROS 2 Jazzy 分布式架构，Raspberry Pi 4B + STM32F103ZET6(底盘) + STM32F103C8T6(机械臂/车载)</li>
         <li>USB 模拟串口连接，开机自启 + 串口绑定自动识别，类《终末地》派状 UI 操控</li>
         <li>独立视觉模块，PC端 OpenCV 仿真 → MaixCDK 交叉编译 → MaixCam2 部署</li>
       </ul>
@@ -1112,7 +1112,7 @@ pre code {
       <div class="arch-label hw">下位机</div>
       <div class="arch-blocks">
         <div class="arch-block hw">
-          <div class="name">STM32F407ZET6</div>
+          <div class="name">STM32F103ZET6</div>
           <div class="detail">底盘电机驱动<br>编码器采集</div>
         </div>
         <div class="arch-block hw">
@@ -1590,7 +1590,7 @@ pre code {
     </div>
     <div class="card">
       <h3>🔌 底层通信</h3>
-      <p>USB模拟串口 (termios) · STM32F407/F103 · MaixCam2 · TCP 网络通信 · sensor_msgs/Joy</p>
+      <p>USB模拟串口 (termios) · STM32F103ZET6/STM32F103C8T6 · MaixCam2 · TCP 网络通信 · sensor_msgs/Joy</p>
     </div>
     <div class="card">
       <h3>🖥️ 工程化</h3>
