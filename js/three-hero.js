@@ -3,6 +3,11 @@
  * 在 Butterfly 主题 #page-header 区域嵌入 Three.js Canvas，
  * 渲染深邃星空粒子系统，支持鼠标视差、缓慢旋转、响应式适配、PJAX 兼容。
  *
+ * === 开关控制 ===
+ *   - 运行时按钮：Hero 区域右下角 ✦ 按钮，点击切换，状态持久化到 localStorage
+ *   - 编程接口：  window.__threeHero.toggle()  / .show() / .hide()
+ *   - 编译级开关：_config.butterfly.yml → three_hero.enable（需注释 inject 行）
+ *
  * 依赖：Three.js (CDN importmap)
  */
 import * as THREE from 'three';
@@ -32,6 +37,8 @@ const CONFIG = {
   desktopPixelRatio: Math.min(window.devicePixelRatio, 2),
   // 闪烁速度
   twinkleSpeed: 0.8,
+  // localStorage 键名
+  storageKey: 'three-hero-visible',
 };
 
 // 星空配色 — 以白/蓝白为主，混入少量紫色调与博客主题呼应
@@ -92,9 +99,15 @@ class ThreeHero {
     this.isRunning = false;
     this.animationId = null;
 
+    // 可见性（从 localStorage 读取，默认显示）
+    this.isVisible = this._loadVisibility();
+
     // 粒子属性（用于闪烁动画）
     this.starBaseSizes = null;
     this.starTwinklePhases = null;
+
+    // 切换按钮
+    this.toggleBtn = null;
   }
 
   // ------------------------------------------
@@ -118,7 +131,9 @@ class ThreeHero {
     this._initScene();
     this._createStarfield();
     this._initCamera();
+    this._createToggleButton();
     this._bindEvents();
+    this._applyVisibility();
     this._startLoop();
   }
 
@@ -151,8 +166,156 @@ class ThreeHero {
     }
     this.canvas = null;
 
+    // 移除切换按钮
+    if (this.toggleBtn && this.toggleBtn.parentNode) {
+      this.toggleBtn.parentNode.removeChild(this.toggleBtn);
+    }
+    this.toggleBtn = null;
+
     this._unbindEvents();
     console.log('[ThreeHero] 已销毁');
+  }
+
+  // ==========================================
+  // 公开 API — 运行时开关控制
+  // ==========================================
+
+  /** 切换星空显示/隐藏 */
+  toggle() {
+    this.isVisible ? this.hide() : this.show();
+  }
+
+  /** 显示星空 */
+  show() {
+    if (this.isVisible) return;
+    this.isVisible = true;
+    this._saveVisibility(true);
+    this._applyVisibility();
+    console.log('[ThreeHero] 星空已开启');
+  }
+
+  /** 隐藏星空 */
+  hide() {
+    if (!this.isVisible) return;
+    this.isVisible = false;
+    this._saveVisibility(false);
+    this._applyVisibility();
+    console.log('[ThreeHero] 星空已关闭');
+  }
+
+  // ------------------------------------------
+  // 可见性持久化
+  // ------------------------------------------
+  _loadVisibility() {
+    try {
+      const stored = localStorage.getItem(CONFIG.storageKey);
+      if (stored !== null) return stored === 'true';
+    } catch { /* localStorage 不可用 */ }
+    return true; // 默认显示
+  }
+
+  _saveVisibility(visible) {
+    try {
+      localStorage.setItem(CONFIG.storageKey, String(visible));
+    } catch { /* localStorage 不可用 */ }
+  }
+
+  // ------------------------------------------
+  // 应用可见性状态到 DOM
+  // ------------------------------------------
+  _applyVisibility() {
+    if (!this.canvas) return;
+
+    if (this.isVisible) {
+      this.canvas.style.display = 'block';
+      // 恢复 header 样式
+      const header = document.querySelector('#page-header');
+      if (header) {
+        header.style.backgroundImage = 'none';
+        header.style.backgroundColor = '#050510';
+      }
+      if (this.toggleBtn) {
+        this.toggleBtn.classList.remove('three-hero-off');
+        this.toggleBtn.title = '关闭星空背景';
+      }
+    } else {
+      this.canvas.style.display = 'none';
+      // 恢复 header 默认背景
+      const header = document.querySelector('#page-header');
+      if (header) {
+        header.style.backgroundImage = '';
+        header.style.backgroundColor = '';
+      }
+      if (this.toggleBtn) {
+        this.toggleBtn.classList.add('three-hero-off');
+        this.toggleBtn.title = '开启星空背景';
+      }
+    }
+  }
+
+  // ------------------------------------------
+  // 切换按钮
+  // ------------------------------------------
+  _createToggleButton() {
+    const btn = document.createElement('button');
+    btn.id = 'three-hero-toggle';
+    btn.className = this.isVisible ? '' : 'three-hero-off';
+    btn.title = this.isVisible ? '关闭星空背景' : '开启星空背景';
+    btn.innerHTML = '✦';
+    btn.style.cssText = `
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      z-index: 10;
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50%;
+      background: rgba(10,10,30,0.5);
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      outline: none;
+      line-height: 1;
+      padding: 0;
+    `;
+
+    // 悬浮效果
+    btn.addEventListener('mouseenter', () => {
+      btn.style.borderColor = 'rgba(184,169,232,0.7)';
+      btn.style.color = '#b8a9e8';
+      btn.style.boxShadow = '0 0 12px rgba(184,169,232,0.3)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.borderColor = 'rgba(255,255,255,0.25)';
+      btn.style.color = 'rgba(255,255,255,0.5)';
+      btn.style.boxShadow = 'none';
+    });
+
+    // 关闭状态样式注入
+    const style = document.createElement('style');
+    style.textContent = `
+      #three-hero-toggle.three-hero-off {
+        color: rgba(255,255,255,0.25) !important;
+        border-color: rgba(255,255,255,0.1) !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggle();
+    });
+
+    const header = document.querySelector('#page-header');
+    if (header) header.appendChild(btn);
+    this.toggleBtn = btn;
   }
 
   // ------------------------------------------
@@ -475,6 +638,9 @@ class ThreeHero {
     this.animationId = requestAnimationFrame(() => this._animate());
 
     if (!this.renderer || !this.scene || !this.camera) return;
+
+    // 隐藏状态：保持循环运行但不渲染
+    if (!this.isVisible) return;
 
     const delta = this.clock.getDelta();
     const dt = Math.min(delta, 0.1);
