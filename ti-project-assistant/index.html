@@ -354,6 +354,50 @@
             pointer-events: none;
         }
 
+        /* === Placeholder slide === */
+        .slide.placeholder {
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 148, 158, 0.015) 2px, rgba(139, 148, 158, 0.015) 4px),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 148, 158, 0.03) 0%, transparent 70%),
+                var(--slide-bg);
+        }
+        .slide.placeholder .content {
+            border: 2px dashed rgba(139, 148, 158, 0.25);
+            border-radius: 12px;
+            padding: 48px 56px;
+        }
+        .slide.placeholder .section-label {
+            color: var(--warn);
+        }
+        .slide.placeholder .placeholder-badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 15px;
+            color: var(--warn);
+            background: rgba(210, 153, 34, 0.12);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+            padding: 4px 14px;
+            border-radius: 3px;
+            margin-bottom: 24px;
+        }
+        .slide.placeholder .placeholder-hint {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin-top: 20px;
+        }
+        .slide.placeholder .placeholder-hint .cmd {
+            color: var(--info);
+            background: rgba(88, 166, 255, 0.1);
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .slide.placeholder::after {
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 148, 158, 0.02) 2px, rgba(139, 148, 158, 0.02) 4px);
+        }
+
         /* === Inline edit hotzone === */
         .edit-hotzone {
             position: fixed; top: 0; left: 0;
@@ -383,7 +427,7 @@
         <main class="deck-stage" id="deckStage">
 
             <!-- ===========================================
-                 SLIDE 1: TITLE
+                 S1: TITLE
                  =========================================== -->
             <section class="slide title-slide active">
                 <div class="topbar reveal">
@@ -394,20 +438,23 @@
                     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                 </div>
                 <div class="content center">
-                    <p class="reveal" style="font-size:20px; color: var(--accent); margin-bottom: 12px;">
+                    <p class="reveal" style="font-size:18px; color: var(--accent); margin-bottom: 8px;">
                         <span style="color: var(--text-dim);">$</span> pip install ti-project-assistant
                     </p>
                     <h1 class="slide-title reveal">
                         Ti-Project-<span class="hl">Assistant</span>
                     </h1>
-                    <p class="body-text reveal" style="margin-bottom: 32px;">
-                        MSPM0 现代化开发利器 · 从零到一的嵌入式开发体验
+                    <p class="body-text reveal" style="margin-bottom: 16px; font-size: 26px;">
+                        电赛在即 · MSPM0 从零到一的现代化开发体验
+                    </p>
+                    <p class="body-text reveal" style="margin-bottom: 28px; font-size: 20px; color: var(--text-dim);">
+                        告别 Keil / CCS · 拥抱 VSCode + CMake + Git · 让环境搭建从半天缩短到一分钟
                     </p>
                     <div class="tag-row reveal">
                         <span class="tag">CMake 驱动</span>
                         <span class="tag">VSCode 深度集成</span>
                         <span class="tag">一键构建·烧录·调试</span>
-                        <span class="tag">告别 Keil / CCS</span>
+                        <span class="tag">XDS110 / DAPLink / JLink</span>
                     </div>
                 </div>
                 <div class="slide-footer reveal">
@@ -417,255 +464,399 @@
             </section>
 
             <!-- ===========================================
-                 SLIDE 2: PAIN POINTS
+                 S2: PAIN POINTS
                  =========================================== -->
             <section class="slide">
                 <div class="gutter">
                     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                 </div>
-                <div class="content top" style="top: 150px;">
+                <div class="content top" style="top: 140px;">
                     <p class="section-label reveal">// 问题</p>
-                    <h2 class="slide-title reveal" style="font-size: 64px;">
-                        传统嵌入式开发<span class="hl">之痛</span>
+                    <h2 class="slide-title reveal" style="font-size: 60px;">
+                        电赛在即，你还在<span class="hl">为这些发愁</span>吗？
                     </h2>
                     <ul class="bullet-list reveal">
-                        <li>Keil / CCS Theia — 笨重的 IDE，Windows 限定</li>
-                        <li>手动管理项目结构，缺乏现代化工程实践</li>
-                        <li>配置繁琐：引脚、时钟、外设分散在多个工具</li>
-                        <li>团队协作困难：没有标准的 CMake + Git 工作流</li>
-                        <li>电赛高压环境：搭建环境就耗掉半天</li>
+                        <li>CCS Theia 基于老版 VSCode，笨重卡顿、Windows 限定</li>
+                        <li>Keil 需要手动管理工程文件和依赖，换个芯片就得重来一遍</li>
+                        <li>引脚、时钟、外设配置分散在多个工具中，流程割裂</li>
+                        <li>团队没有标准的 CMake + Git 工作流，协同全靠压缩包</li>
+                        <li>电赛高压下，仅搭建开发环境就耗掉半天 — 时间是最宝贵的</li>
                     </ul>
                 </div>
                 <div class="slide-footer">
-                    <span>痛点</span><span>2 / 9</span>
+                    <span>痛点</span><span>2 / 20</span>
                 </div>
             </section>
 
             <!-- ===========================================
-                 SLIDE 3: SOLUTION
+                 S3: WHAT IS TPA
                  =========================================== -->
             <section class="slide">
                 <div class="gutter">
                     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                 </div>
-                <div class="content top" style="top: 150px;">
-                    <p class="section-label reveal">// 方案</p>
-                    <h2 class="slide-title reveal" style="font-size: 64px;">
-                        一行命令<span class="hl">，</span>全流程覆盖
+                <div class="content top" style="top: 140px;">
+                    <p class="section-label reveal">// 定义</p>
+                    <h2 class="slide-title reveal" style="font-size: 60px;">
+                        TPA<span class="hl"> 是什么？</span>
                     </h2>
-                    <div class="code-block reveal">
-                        <span class="prompt">$</span> pip install ti-project-assistant<br>
-                        <span class="prompt">$</span> mspm0-init <span class="comment"># 在 .syscfg 目录下运行</span><br>
-                        <span class="prompt">$</span> code .               <span class="comment"># 在 VSCode 中打开</span><br>
-                        <span class="prompt">$</span> F5                   <span class="comment"># 一键编译 + 烧录 + 调试</span>
-                    </div>
-                    <div class="tag-row reveal">
-                        <span class="tag">Python · PyPI 分发</span>
-                        <span class="tag">自动 CMake 生成</span>
-                        <span class="tag">SysConfig CLI 集成</span>
-                        <span class="tag">VSCode 全套配置</span>
-                    </div>
-                </div>
-                <div class="slide-footer">
-                    <span>方案</span><span>3 / 9</span>
-                </div>
-            </section>
-
-            <!-- ===========================================
-                 SLIDE 4: TOOLCHAIN FLOW
-                 =========================================== -->
-            <section class="slide">
-                <div class="gutter">
-                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-                </div>
-                <div class="content center" style="top: 120px; transform: none;">
-                    <p class="section-label reveal">// 流程</p>
-                    <h2 class="slide-title reveal" style="font-size: 60px; margin-bottom: 48px;">
-                        编译 → 烧录 → 调试<span class="hl"> 全链路</span>
-                    </h2>
-                    <div class="flow-row reveal">
-                        <div class="flow-step">
-                            <div class="step-icon">📝</div>
-                            <div class="step-title">编写代码</div>
-                            <div class="step-desc">VSCode 中写 C/C++<br>保存到 src/ 目录</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">⚙️</div>
-                            <div class="step-title">编译</div>
-                            <div class="step-desc"><span style="color:var(--accent);">arm-none-eabi-gcc</span><br>CMake + Ninja 构建<br>生成 .elf 二进制</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">📥</div>
-                            <div class="step-title">烧录</div>
-                            <div class="step-desc"><span style="color:var(--accent);">OpenOCD</span><br>USB → 烧录器 → 芯片<br>写入 Flash</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🔍</div>
-                            <div class="step-title">调试</div>
-                            <div class="step-desc"><span style="color:var(--accent);">GDB</span><br>断点 · 单步 · 寄存器<br>源码级调试</div>
-                        </div>
-                    </div>
-                    <p class="body-text reveal" style="text-align:center; margin-top: 40px; font-size: 20px; color: var(--text-dim);">
-                        SysConfig (图形化引脚配置) → mspm0-init (一键生成) → VSCode (编辑 & 调试)
+                    <p class="body-text reveal" style="margin-bottom: 28px; font-size: 26px;">
+                        一个基于 Python 的 CLI 工具，通过 <span class="cmd">pip install ti-project-assistant</span> 一键安装。
                     </p>
-                </div>
-                <div class="slide-footer">
-                    <span>全链路</span><span>4 / 9</span>
-                </div>
-            </section>
-
-            <!-- ===========================================
-                 SLIDE 5: THREE STEPS
-                 =========================================== -->
-            <section class="slide">
-                <div class="gutter">
-                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-                </div>
-                <div class="content top" style="top: 140px;">
-                    <p class="section-label reveal">// 上手</p>
-                    <h2 class="slide-title reveal" style="font-size: 60px;">
-                        三步<span class="hl">上手</span>
-                    </h2>
-                    <div class="step-list reveal">
-                        <div class="step-item">
-                            <span class="step-num">①</span>
-                            <div class="step-info">
-                                <h4>安装依赖</h4>
-                                <p><span class="cmd">pip install ti-project-assistant</span> + ARM GCC + CMake + Ninja + MSPM0 SDK + SysConfig</p>
-                            </div>
-                        </div>
-                        <div class="step-item">
-                            <span class="step-num">②</span>
-                            <div class="step-info">
-                                <h4>配置芯片</h4>
-                                <p>SysConfig GUI 图形化配置引脚/时钟/外设，保存为 <span class="path">.syscfg</span> 文件</p>
-                            </div>
-                        </div>
-                        <div class="step-item">
-                            <span class="step-num">③</span>
-                            <div class="step-info">
-                                <h4>运行脚本</h4>
-                                <p>在项目目录运行 <span class="cmd">mspm0-init</span>，自动生成工程 — 然后 <span class="cmd">code .</span> 开始编码</p>
-                            </div>
-                        </div>
+                    <p class="body-text reveal" style="margin-bottom: 28px; font-size: 26px;">
+                        它的核心工作：<span class="hl">读取 SysConfig 图形化配置</span> → <span class="hl">调用 TI CLI 生成驱动代码</span> → <span class="hl">组装 CMake 工程 + VSCode 全套配置</span>
+                    </p>
+                    <div class="tag-row reveal">
+                        <span class="tag">🐍 Python · PyPI</span>
+                        <span class="tag">🏗️ CMake 自动化</span>
+                        <span class="tag">🖥️ Win / Linux</span>
+                        <span class="tag">🔌 XDS110 · DAPLink · JLink</span>
                     </div>
                 </div>
                 <div class="slide-footer">
-                    <span>三步上手</span><span>5 / 9</span>
+                    <span>TPA 是什么</span><span>3 / 20</span>
                 </div>
             </section>
 
             <!-- ===========================================
-                 SLIDE 6: PROJECT STRUCTURE
-                 =========================================== -->
-            <section class="slide">
-                <div class="gutter">
-                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-                </div>
-                <div class="content top" style="top: 120px;">
-                    <p class="section-label reveal">// 结构</p>
-                    <h2 class="slide-title reveal" style="font-size: 56px;">
-                        现代化<span class="hl">项目架构</span>
-                    </h2>
-                    <div class="dir-tree reveal" style="margin-top: 20px;">
-                        <span class="dir">my_project/</span><br>
-                        &nbsp;&nbsp;├── <span class="file">CMakeLists.txt</span>              <span class="cmt">// CMake 构建定义</span><br>
-                        &nbsp;&nbsp;├── <span class="file">my_project.syscfg</span>           <span class="cmt">// 原始 SysConfig 配置</span><br>
-                        &nbsp;&nbsp;├── <span class="dir">config/</span>                      <span class="cmt">// 自动生成代码（勿手动编辑）</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="cfg">ti_msp_dl_config.c/h</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="cfg">device_linker.lds</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="cfg">device.opt</span><br>
-                        &nbsp;&nbsp;├── <span class="dir">inc/</span>                         <span class="cmt">// 头文件（分层）</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="dir">app/</span> · <span class="dir">driver/</span> · <span class="dir">modules/</span> · <span class="dir">utils/</span><br>
-                        &nbsp;&nbsp;├── <span class="dir">src/</span>                         <span class="cmt">// 源代码（在此编码）</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">main.c</span>                  <span class="cmt">// ← 你的代码从这里开始</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="dir">app/</span> · <span class="dir">driver/</span> · <span class="dir">modules/</span> · <span class="dir">utils/</span><br>
-                        &nbsp;&nbsp;├── <span class="dir">.vscode/</span>                     <span class="cmt">// VSCode 全套配置</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="cfg">launch.json</span>              <span class="cmt">// 调试配置</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="cfg">tasks.json</span>              <span class="cmt">// 构建/烧录任务</span><br>
-                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="cfg">settings.json</span>            <span class="cmt">// 状态栏按钮</span><br>
-                        &nbsp;&nbsp;└── <span class="dir">build/</span>                        <span class="cmt">// 构建输出 (ELF/HEX/BIN)</span>
-                    </div>
-                </div>
-                <div class="slide-footer">
-                    <span>项目结构</span><span>6 / 9</span>
-                </div>
-            </section>
-
-            <!-- ===========================================
-                 SLIDE 7: VSCODE INTEGRATION
-                 =========================================== -->
-            <section class="slide">
-                <div class="gutter">
-                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-                </div>
-                <div class="content top" style="top: 140px;">
-                    <p class="section-label reveal">// 集成</p>
-                    <h2 class="slide-title reveal" style="font-size: 60px;">
-                        VSCode<span class="hl"> 深度集成</span>
-                    </h2>
-                    <ul class="check-list reveal">
-                        <li>状态栏一键操作：SysConfig / Build / Flash / Clean</li>
-                        <li>F5 启动调试，断点 · 单步 · 变量监视</li>
-                        <li>IntelliSense 自动补全 + 跳转定义</li>
-                        <li>Task Buttons 插件 — 状态栏快捷按钮</li>
-                        <li>动态切换调试器：<span class="cmd">mspm0-init regenerate -d xds110</span></li>
-                        <li>Git 自动初始化 + .gitignore 生成</li>
-                    </ul>
-                </div>
-                <div class="slide-footer">
-                    <span>VSCode 集成</span><span>7 / 9</span>
-                </div>
-            </section>
-
-            <!-- ===========================================
-                 SLIDE 8: CROSS PLATFORM
+                 S4: WHO IS THIS FOR
                  =========================================== -->
             <section class="slide">
                 <div class="gutter">
                     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                 </div>
                 <div class="content top" style="top: 130px;">
-                    <p class="section-label reveal">// 跨平台</p>
+                    <p class="section-label reveal">// 受众</p>
                     <h2 class="slide-title reveal" style="font-size: 56px;">
+                        无论<span class="hl">新手</span>还是<span class="hl">老手</span>
+                    </h2>
+                    <div class="cmp-table reveal">
+                        <div class="cmp-col">
+                            <h4>🌱 刚接触嵌入式</h4>
+                            <p>
+                                保姆级教程带你一步步理解：<br><br>
+                                为什么要装 arm-gcc？OpenOCD 是干什么的？<br><br>
+                                <span style="color: var(--accent);">不仅教你怎么做，更告诉你为什么</span><br><br>
+                                从零搭建现代化开发环境<br>
+                                少走弯路，建立正确的工程习惯
+                            </p>
+                        </div>
+                        <div class="cmp-col">
+                            <h4>⚡ 有 STM32 / MCU 经验</h4>
+                            <p>
+                                跳过基础科普，直接看 TPA 怎么用：<br><br>
+                                <span class="cmd">pip install ti-project-assistant</span><br>
+                                <span class="cmd">mspm0-init</span><br><br>
+                                <span style="color: var(--accent);">一行命令替代半小时手工配置</span><br><br>
+                                CMake 工程直接上手，Git 协作开箱即用
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>受众</span><span>4 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S5: DEV FLOW 101
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content center" style="top: 120px; transform: none;">
+                    <p class="section-label reveal">// 科普</p>
+                    <h2 class="slide-title reveal" style="font-size: 56px; margin-bottom: 40px;">
+                        嵌入式开发<span class="hl"> 四个环节</span>
+                    </h2>
+                    <div class="flow-row reveal">
+                        <div class="flow-step">
+                            <div class="step-icon">📝</div>
+                            <div class="step-title">代码编写</div>
+                            <div class="step-desc">需要一个趁手的<span style="color:var(--accent);">编辑器/IDE</span><br>VSCode · Keil · CCS</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">⚙️</div>
+                            <div class="step-title">编译</div>
+                            <div class="step-desc">把 C 代码翻译成机器码<br>需要<span style="color:var(--accent);">交叉编译器</span><br>arm-none-eabi-gcc</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">📥</div>
+                            <div class="step-title">烧录</div>
+                            <div class="step-desc">把二进制写入芯片 Flash<br>需要<span style="color:var(--accent);">烧录服务器 + 烧录器</span><br>OpenOCD + XDS110/DAPLink</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">🔍</div>
+                            <div class="step-title">调试</div>
+                            <div class="step-desc">排查 bug、定位问题<br>需要<span style="color:var(--accent);">调试服务器 + 客户端</span><br>OpenOCD + GDB</div>
+                        </div>
+                    </div>
+                    <p class="body-text reveal" style="text-align:center; margin-top: 32px; font-size: 19px; color: var(--text-dim);">
+                        理解每个环节需要什么工具，安装依赖就不再是"不知道为什么装"的魔法
+                    </p>
+                </div>
+                <div class="slide-footer">
+                    <span>开发流程</span><span>5 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S6: TOOLCHAIN MAP
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 110px;">
+                    <p class="section-label reveal">// 地图</p>
+                    <h2 class="slide-title reveal" style="font-size: 52px; margin-bottom: 32px;">
+                        完整<span class="hl">工具链地图</span>
+                    </h2>
+                    <div class="cmp-table reveal">
+                        <div class="cmp-col">
+                            <h4>🔧 核心工具（必需）</h4>
+                            <p>
+                                <span style="color:var(--accent);">Python</span> — TPA 脚本的运行环境<br>
+                                <span style="color:var(--accent);">arm-none-eabi-gcc</span> — ARM 交叉编译器<br>
+                                <span style="color:var(--accent);">MSPM0 SDK</span> — TI 官方芯片驱动库<br>
+                                <span style="color:var(--accent);">SysConfig</span> — TI 图形化引脚配置工具<br>
+                                <span style="color:var(--accent);">OpenOCD</span> — 烧录 & 调试服务器<br>
+                                <span style="color:var(--accent);">arm-none-eabi-gdb</span> — 调试客户端<br>
+                                <span style="color:var(--accent);">CMake + Ninja</span> — 构建系统<br>
+                                <span style="color:var(--accent);">Git</span> — 版本控制 & 多人协同
+                            </p>
+                        </div>
+                        <div class="cmp-col">
+                            <h4>🔌 调试器支持（三选一）</h4>
+                            <p>
+                                <span style="color:var(--accent);">XDS110</span> — TI LaunchPad 板载<br><br>
+                                <span style="color:var(--accent);">DAPLink</span> — ARM 标准 CMSIS-DAP<br><br>
+                                <span style="color:var(--accent);">JLink</span> — SEGGER 高性能调试器<br><br>
+                                <span style="color: var(--warn);">动态切换：mspm0-init regenerate -d &lt;debugger&gt;</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>工具链</span><span>6 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S7: SOLUTION
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 130px;">
+                    <p class="section-label reveal">// 方案</p>
+                    <h2 class="slide-title reveal" style="font-size: 58px;">
+                        一行命令<span class="hl">，</span>全流程覆盖
+                    </h2>
+                    <p class="body-text reveal" style="margin-bottom: 24px; font-size: 24px;">
+                        TPA 连接 <span class="hl">SysConfig 图形化配置</span> 与 <span class="hl">CMake 构建生态</span>，把分散的手工步骤自动化
+                    </p>
+                    <div class="code-block reveal">
+                        <span class="comment"># 1. 安装 TPA（Python ≥ 3.9）</span><br>
+                        <span class="prompt">$</span> pip install ti-project-assistant<br><br>
+                        <span class="comment"># 2. 在含有 .syscfg 的目录下运行</span><br>
+                        <span class="prompt">$</span> mspm0-init<br><br>
+                        <span class="comment"># 3. 在 VSCode 中打开，F5 一键编译+烧录+调试</span><br>
+                        <span class="prompt">$</span> code . && F5
+                    </div>
+                    <div class="tag-row reveal">
+                        <span class="tag">PyPI 一键安装</span>
+                        <span class="tag">自动 CMake 工程</span>
+                        <span class="tag">SysConfig CLI 集成</span>
+                        <span class="tag">VSCode 开箱即用</span>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>方案</span><span>7 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S8: THREE STEPS
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 120px;">
+                    <p class="section-label reveal">// 上手</p>
+                    <h2 class="slide-title reveal" style="font-size: 56px;">
+                        三步<span class="hl">上手</span>，立竿见影
+                    </h2>
+                    <div class="step-list reveal">
+                        <div class="step-item">
+                            <span class="step-num">①</span>
+                            <div class="step-info">
+                                <h4>安装依赖</h4>
+                                <p><span class="cmd">pip install ti-project-assistant</span> + ARM GCC + CMake + Ninja + MSPM0 SDK + SysConfig + OpenOCD — 跟着教程一步步走，30 分钟内完成</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">②</span>
+                            <div class="step-info">
+                                <h4>配置芯片</h4>
+                                <p>打开 SysConfig GUI，像 CubeMX 一样图形化拖拽引脚、配置时钟和外设，保存 <span class="path">.syscfg</span> 文件到项目目录</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">③</span>
+                            <div class="step-info">
+                                <h4>生成项目</h4>
+                                <p>终端运行 <span class="cmd">mspm0-init</span> — TPA 自动读取配置、生成 CMake 工程和 VSCode 全套配置，然后 <span class="cmd">code .</span> 直接开始编码</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="body-text reveal" style="text-align:center; margin-top: 20px; font-size: 18px; color: var(--text-dim);">
+                        之后修改引脚配置？改完 .syscfg 运行 <span class="cmd">mspm0-init regenerate</span> 即可，无需重建项目
+                    </p>
+                </div>
+                <div class="slide-footer">
+                    <span>三步上手</span><span>8 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S9: PROJECT STRUCTURE
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 100px;">
+                    <p class="section-label reveal">// 结构</p>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        现代化<span class="hl">项目架构</span>
+                    </h2>
+                    <p class="body-text reveal" style="margin-bottom: 16px; font-size: 20px;">
+                        <span class="hl">分层设计</span> · 自动生成与手写代码隔离 · 递归编译，新建文件自动参与构建
+                    </p>
+                    <div class="dir-tree reveal" style="margin-top: 12px; font-size: 20px;">
+                        <span class="dir">my_project/</span><br>
+                        &nbsp;&nbsp;├── <span class="file">CMakeLists.txt</span>              <span class="cmt">// 顶层构建定义，自动递归链接</span><br>
+                        &nbsp;&nbsp;├── <span class="file">my_project.syscfg</span>           <span class="cmt">// SysConfig 原始配置（可再编辑）</span><br>
+                        &nbsp;&nbsp;├── <span class="dir">config/</span>                      <span class="cmt">// ⚠️ 自动生成 - 勿手动编辑</span><br>
+                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="cfg">ti_msp_dl_config.c/h</span>   <span class="cmt">// 驱动库配置</span><br>
+                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="cfg">device_linker.lds</span>        <span class="cmt">// 链接脚本</span><br>
+                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="cfg">device.opt</span>               <span class="cmt">// 编译选项</span><br>
+                        &nbsp;&nbsp;├── <span class="dir">inc/</span>                         <span class="cmt">// 头文件（app/driver/modules/utils 分层）</span><br>
+                        &nbsp;&nbsp;├── <span class="dir">src/</span>                         <span class="cmt">// 源代码 — 你的代码从这里开始 ↓</span><br>
+                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">main.c</span><br>
+                        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="dir">app/</span> · <span class="dir">driver/</span> · <span class="dir">modules/</span> · <span class="dir">utils/</span><br>
+                        &nbsp;&nbsp;├── <span class="dir">.vscode/</span>                     <span class="cmt">// launch.json · tasks.json · settings.json</span><br>
+                        &nbsp;&nbsp;└── <span class="dir">build/</span>                        <span class="cmt">// 构建输出 (ELF/HEX/BIN)</span>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>项目结构</span><span>9 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S10: VSCODE INTEGRATION
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 120px;">
+                    <p class="section-label reveal">// 集成</p>
+                    <h2 class="slide-title reveal" style="font-size: 56px;">
+                        VSCode<span class="hl"> 深度集成</span>
+                    </h2>
+                    <ul class="check-list reveal">
+                        <li>状态栏一键按钮：SysConfig / Build / Flash / Clean — Task Buttons 插件驱动</li>
+                        <li>F5 启动调试：断点 · 单步执行 · 变量监视 · 寄存器查看 · 源码级调试</li>
+                        <li>IntelliSense 自动补全 + 跳转定义 — c_cpp_properties.json 自动配置</li>
+                        <li>动态切换调试器：<span class="cmd">mspm0-init regenerate -d xds110|daplink|jlink</span></li>
+                        <li>Git 自动初始化 + .gitignore — 团队协作开箱即用</li>
+                        <li>接入 AI 插件（Copilot / Claude）实现全流程智能辅助编程</li>
+                    </ul>
+                </div>
+                <div class="slide-footer">
+                    <span>VSCode 集成</span><span>10 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S11: CROSS PLATFORM
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 110px;">
+                    <p class="section-label reveal">// 跨平台</p>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
                         Windows &<span class="hl"> Linux</span> 全支持
                     </h2>
                     <div class="cmp-table reveal">
                         <div class="cmp-col">
                             <h4>🪟 Windows</h4>
                             <p>
-                                <span style="color: var(--accent);">winget</span> 一行安装基础工具链<br><br>
-                                TI 工具默认路径 <span class="path">C:\ti\</span><br><br>
-                                SysConfig CLI: <span class="path">.bat</span><br><br>
-                                调试器即插即用<br><br>
-                                脚本自动适配 Windows 路径
+                                <span style="color: var(--accent);">winget</span> 一行安装 CMake / Ninja / Git<br><br>
+                                TI 工具默认路径 <span class="path">C:\ti\</span>（自动检测）<br><br>
+                                SysConfig CLI: <span class="path">.bat</span> 批处理调用<br><br>
+                                调试器即插即用，无需额外驱动配置<br><br>
+                                脚本自动适配 Windows 路径和编码
                             </p>
                         </div>
                         <div class="cmp-col">
                             <h4>🐧 Linux</h4>
                             <p>
-                                <span style="color: var(--accent);">apt</span> 一行安装基础工具链<br><br>
-                                TI 工具默认路径 <span class="path">~/ti/</span><br><br>
-                                SysConfig CLI: <span class="path">.sh</span><br><br>
-                                需配置 <span style="color: var(--warn);">udev</span> 调试器权限<br><br>
-                                脚本最初在 Linux 下编写测试
+                                <span style="color: var(--accent);">apt</span> 一行安装 CMake / Make / Git<br><br>
+                                TI 工具默认路径 <span class="path">~/ti/</span>（自动检测）<br><br>
+                                SysConfig CLI: <span class="path">.sh</span> Shell 脚本调用<br><br>
+                                需配置 <span style="color: var(--warn);">udev</span> 规则以获取调试器 USB 权限<br><br>
+                                TPA 最初在 Linux 下开发，原生支持最好
                             </p>
                         </div>
                     </div>
-                    <p class="body-text reveal" style="text-align:center; margin-top: 28px; font-size: 20px; color: var(--text-dim);">
-                        同一套命令：<span class="cmd">mspm0-init</span> → <span class="cmd">code .</span> → <span class="cmd">F5</span> — 两个平台体验一致
+                    <p class="body-text reveal" style="text-align:center; margin-top: 24px; font-size: 19px; color: var(--accent);">
+                        同一套命令 · 同一套工程 · 同一套工作流 — 跨平台无缝切换
                     </p>
                 </div>
                 <div class="slide-footer">
-                    <span>跨平台</span><span>8 / 9</span>
+                    <span>跨平台</span><span>11 / 20</span>
                 </div>
             </section>
 
             <!-- ===========================================
-                 SLIDE 9: SUMMARY & CTA
+                 S12: BEYOND BASICS
+                 =========================================== -->
+            <section class="slide">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 130px;">
+                    <p class="section-label reveal">// 生态</p>
+                    <h2 class="slide-title reveal" style="font-size: 56px;">
+                        不止于<span class="hl">项目生成</span>
+                    </h2>
+                    <ul class="bullet-list reveal">
+                        <li><span style="color:var(--accent);">Git 协同</span> — 自动初始化仓库 + .gitignore，团队协作告别压缩包传代码</li>
+                        <li><span style="color:var(--accent);">CMake 可扩展</span> — 分层 inc/src 目录自动递归链接，新增文件无需改 CMakeLists.txt</li>
+                        <li><span style="color:var(--accent);">AI 辅助编程</span> — VSCode 插件生态无缝接入 Copilot、Claude 等 AI 工具，Vibe Coding 不是梦</li>
+                        <li><span style="color:var(--accent);">持续发布</span> — GitHub Actions 自动化构建，tag 推送即发布 PyPI，始终获取最新版</li>
+                        <li><span style="color:var(--accent);">开源社区</span> — MIT 协议，欢迎 Issue / PR / Star，一起把 MSPM0 开发体验推向极致</li>
+                    </ul>
+                </div>
+                <div class="slide-footer">
+                    <span>不止于开发</span><span>12 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 S13: SUMMARY & CTA
                  =========================================== -->
             <section class="slide">
                 <div class="gutter">
@@ -673,7 +864,7 @@
                 </div>
                 <div class="content center">
                     <p class="section-label reveal">// 开始</p>
-                    <h2 class="slide-title reveal" style="font-size: 64px;">
+                    <h2 class="slide-title reveal" style="font-size: 60px;">
                         准备好<span class="hl">开始</span>了吗？
                     </h2>
                     <div class="code-block reveal">
@@ -683,25 +874,189 @@
                         <span class="prompt">$</span> mspm0-init --check<br><br>
                         <span class="comment"># 创建项目</span><br>
                         <span class="prompt">$</span> mspm0-init<br><br>
-                        <span class="comment"># 开始编码</span><br>
+                        <span class="comment"># 打开 VSCode，开始编码</span><br>
                         <span class="prompt">$</span> code . && F5
                     </div>
-                    <p class="body-text reveal" style="margin-top: 32px; font-size: 24px; text-align: center; color: var(--accent);">
+                    <p class="body-text reveal" style="margin-top: 28px; font-size: 22px; text-align: center; color: var(--accent);">
                         ⭐ github.com/AndyYang12345/Ti-Project-Assistant
                     </p>
-                    <p class="body-text reveal" style="margin-top: 12px; font-size: 20px; text-align: center; color: var(--text-dim);">
-                        开源 · MIT 协议 · 电赛加油 ⚡
+                    <p class="body-text reveal" style="margin-top: 12px; font-size: 18px; text-align: center; color: var(--text-dim);">
+                        详细文字教程 · 演示文稿 · 视频教程 均在博客发布 | 开源 · MIT · 电赛加油 ⚡
                     </p>
                 </div>
                 <div class="slide-footer">
-                    <span>Harekasa</span><span>9 / 9</span>
+                    <span>Harekasa</span><span>13 / 20</span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 P1-P7: CONFIG DEMO PLACEHOLDERS
+                 =========================================== -->
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 160px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 配置演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        环境配置 ① —<span class="hl"> Python 与 TPA 安装</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• <span class="cmd">python --version</span> / <span class="cmd">pip --version</span> — 验证 Python 环境</p>
+                        <p>• <span class="cmd">pip install ti-project-assistant</span> — 一键安装 TPA</p>
+                        <p>• <span class="cmd">mspm0-init --version</span> — 确认安装成功</p>
+                        <p>• <span class="cmd">mspm0-init --check</span> — 首次环境检查（预期大量未安装）</p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入终端截图或录屏</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 环境配置 ①</span><span>14 / 20</span>
+                </div>
+            </section>
+
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 160px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 配置演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        环境配置 ② —<span class="hl"> ARM GCC 工具链</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• MSys2 用户：<span class="cmd">pacman -S mingw-w64-x86_64-arm-none-eabi-toolchain</span></p>
+                        <p>• 官网下载安装包 + PATH 配置</p>
+                        <p>• <span class="cmd">arm-none-eabi-gcc --version</span> — 验证安装</p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入终端截图或录屏</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 环境配置 ②</span><span>15 / 20</span>
+                </div>
+            </section>
+
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 160px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 配置演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        环境配置 ③ —<span class="hl"> MSPM0 SDK + SysConfig</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• TI 官网下载 MSPM0 SDK（需登录 + 填表单）</p>
+                        <p>• TI 官网下载 SysConfig 独立版</p>
+                        <p>• 安装路径建议：<span class="cmd">E:\ti\</span> 或 <span class="cmd">~/ti/</span>（<span style="color:var(--error);">路径不能含中文！</span>）</p>
+                        <p>• 环境变量配置或将工具放入默认路径</p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入安装过程截图或录屏</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 环境配置 ③</span><span>16 / 20</span>
+                </div>
+            </section>
+
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 160px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 配置演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        环境配置 ④ —<span class="hl"> OpenOCD + GDB</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• VSCode 插件市场搜索安装 <span class="cmd">TI Embedded Development For VS Code</span></p>
+                        <p>• 插件侧边栏入口 → 点击 "全部依赖下载" 一键安装 OpenOCD + GDB</p>
+                        <p>• TPA 脚本自动在对应目录查找工具，无需手动配置路径</p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入 VSCode 操作截图或录屏</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 环境配置 ④</span><span>17 / 20</span>
+                </div>
+            </section>
+
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 160px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 配置演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        环境配置 ⑤ —<span class="hl"> CMake + Ninja + Git</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• <span class="cmd">winget install Kitware.CMake</span> / <span class="cmd">winget install Ninja-build.Ninja</span></p>
+                        <p>• <span class="cmd">winget install --id Git.Git -e --source winget</span></p>
+                        <p>• 分别用 <span class="cmd">--version</span> 验证安装成功</p>
+                        <p>• Git 初始配置：<span class="cmd">git config --global user.name/email</span></p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入终端截图或录屏</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 环境配置 ⑤</span><span>18 / 20</span>
+                </div>
+            </section>
+
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 160px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 配置演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 52px;">
+                        环境配置 ⑥ —<span class="hl"> 环境变量与最终验证</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• Windows 系统环境变量设置 → 添加 SDK、SysConfig、ARM GCC 的 bin 目录到 PATH</p>
+                        <p>• <span class="cmd">mspm0-init --check</span> — 全部通过 ✓</p>
+                        <p>• 至此环境配置全部完成，可以开始创建项目</p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入环境变量设置截图和 check 结果</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 环境配置 ⑥</span><span>19 / 20</span>
+                </div>
+            </section>
+
+            <section class="slide placeholder">
+                <div class="gutter">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="content top" style="top: 130px;">
+                    <span class="placeholder-badge reveal">[ 占位 · 实操演示 ]</span>
+                    <h2 class="slide-title reveal" style="font-size: 48px;">
+                        项目创建与<span class="hl"> 实操演示</span>
+                    </h2>
+                    <div class="placeholder-hint reveal">
+                        <p>📌 演示内容：</p>
+                        <p style="margin-top: 12px;">• <span class="cmd">mspm0-init --help</span> — 查看所有命令和参数</p>
+                        <p>• <span class="cmd">mspm0-init new -n my_project -d xds110</span> — 创建项目</p>
+                        <p>• 打开 SysConfig 进行引脚配置，保存 .syscfg</p>
+                        <p>• <span class="cmd">mspm0-init</span> — 生成完整工程</p>
+                        <p>• <span class="cmd">code .</span> → F5 — VSCode 打开 → 一键编译烧录调试</p>
+                        <p>• 状态栏按钮演示：SysConfig / Build / Flash / Clean</p>
+                        <p>• <span class="cmd">mspm0-init regenerate -d jlink</span> — 切换调试器</p>
+                        <p style="margin-top: 16px; color: var(--warn);">⬆ 在此区域插入实操录屏或分步截图</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <span>[占位] 实操演示</span><span>20 / 20</span>
                 </div>
             </section>
 
         </main>
     </div>
 
-    <div class="deck-controls" id="slideCounter">1 / 9</div>
+    <div class="deck-controls" id="slideCounter">1 / 20</div>
 
     <script>
         /* ===========================================
