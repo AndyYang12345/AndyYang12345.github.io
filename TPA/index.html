@@ -1,0 +1,481 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>TPA · TI Project Assistant | Ciallo(∠・ω&lt; )⌒☆</title><meta name="author" content="Harekasa"><meta name="copyright" content="Harekasa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F5F0FF"><meta name="description" content="TPA · TI Project Assistant 一行命令，从 SysConfig 图形化配置出发，自动生成完整的 TI MSPM0 嵌入式项目。告别 CCS 手动配置。  仓库地址：GitHub | PyPI  安装1pip install ti-project-assistant  验证： 1mspm0-init --version   # 或 -V   快速开始123456789# 1.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TPA · TI Project Assistant">
+<meta property="og:url" content="https://andyyang12345.github.io/TPA/index.html">
+<meta property="og:site_name" content="Ciallo(∠・ω&lt; )⌒☆">
+<meta property="og:description" content="TPA · TI Project Assistant 一行命令，从 SysConfig 图形化配置出发，自动生成完整的 TI MSPM0 嵌入式项目。告别 CCS 手动配置。  仓库地址：GitHub | PyPI  安装1pip install ti-project-assistant  验证： 1mspm0-init --version   # 或 -V   快速开始123456789# 1.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://andyyang12345.github.io/img/github-profile.png">
+<meta property="article:published_time" content="2026-07-15T17:17:45.000Z">
+<meta property="article:modified_time" content="2026-07-15T17:19:43.401Z">
+<meta property="article:author" content="Harekasa">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://andyyang12345.github.io/img/github-profile.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/prts-512x512.png"><link rel="canonical" href="https://andyyang12345.github.io/TPA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A2438')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F5F0FF')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'TPA · TI Project Assistant',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-home-page" id="page-header" style="background-image: url(/img/top_image.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Ciallo(∠・ω&lt; )⌒☆</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="page-site-info"><h1 id="site-title">TPA · TI Project Assistant</h1></div></header><main class="layout" id="content-inner"><div id="page"><div class="container" id="article-container"><h1 id="TPA-·-TI-Project-Assistant"><a href="#TPA-·-TI-Project-Assistant" class="headerlink" title="TPA · TI Project Assistant"></a>TPA · TI Project Assistant</h1><blockquote>
+<p><strong>一行命令</strong>，从 <a target="_blank" rel="noopener" href="https://www.ti.com/tool/SYSCONFIG">SysConfig</a> 图形化配置出发，自动生成完整的 TI MSPM0 嵌入式项目。告别 CCS 手动配置。</p>
+</blockquote>
+<p>仓库地址：<a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/Ti-Project-Assistant">GitHub</a> | <a target="_blank" rel="noopener" href="https://pypi.org/project/ti-project-assistant/">PyPI</a></p>
+<hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install ti-project-assistant</span><br></pre></td></tr></table></figure>
+
+<p>验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init --version   <span class="comment"># 或 -V</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 用 SysConfig GUI 配好芯片和引脚，保存 .syscfg 到空目录，然后：</span></span><br><span class="line">mspm0-init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 构建</span></span><br><span class="line">cmake --build build -j$(<span class="built_in">nproc</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. VSCode 调试</span></span><br><span class="line">code .</span><br><span class="line"><span class="comment"># 按 F5 → 选择 CMSIS-DAP / XDS110 / JLink</span></span><br></pre></td></tr></table></figure>
+
+<p>修改配置后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init regenerate    <span class="comment"># 仅更新生成文件，src/ 下手写代码安全无虞</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="功能特性"><a href="#功能特性" class="headerlink" title="功能特性"></a>功能特性</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>🔌 芯片支持</td>
+<td>SDK 中<strong>全部 58 款 MSPM0</strong> 芯片，运行时动态发现</td>
+</tr>
+<tr>
+<td>🛠 调试器</td>
+<td><strong>CMSIS-DAP</strong> &#x2F; <strong>XDS110</strong> &#x2F; <strong>JLink</strong> &#x2F; <strong>none</strong> 四种模式</td>
+</tr>
+<tr>
+<td>📁 项目结构</td>
+<td>分层 <code>inc/</code>&#x2F;<code>src/</code>，<code>config/</code> 隔离自动生成代码</td>
+</tr>
+<tr>
+<td>⚙️ CMake</td>
+<td><code>file(GLOB_RECURSE)</code> 递归链接，arm-none-eabi-gcc 工具链</td>
+</tr>
+<tr>
+<td>🖥 VSCode 集成</td>
+<td>全套 <code>.vscode/</code> 配置（launch &#x2F; tasks &#x2F; settings &#x2F; c_cpp_properties）</td>
+</tr>
+<tr>
+<td>🔄 regenerate</td>
+<td>修改引脚后一键重生成，<strong>手写代码不受影响</strong></td>
+</tr>
+<tr>
+<td>🐙 Git</td>
+<td>检测到 Git 时自动 <code>init</code> + <code>.gitignore</code></td>
+</tr>
+<tr>
+<td>🔘 状态栏按钮</td>
+<td>配合 Task Buttons 插件，SysConfig &#x2F; Build &#x2F; Flash &#x2F; Clean 一键操作</td>
+</tr>
+<tr>
+<td>🌍 跨平台</td>
+<td>Windows &#x2F; Linux，PATH 优先自动发现工具链</td>
+</tr>
+<tr>
+<td>🔍 自检</td>
+<td><code>mspm0-init --check</code> 一键诊断环境状态</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="环境依赖速查"><a href="#环境依赖速查" class="headerlink" title="环境依赖速查"></a>环境依赖速查</h2><h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><table>
+<thead>
+<tr>
+<th>依赖</th>
+<th>版本</th>
+<th>安装方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python</td>
+<td>≥ 3.8</td>
+<td><code>winget install Python.Python.3.12</code></td>
+</tr>
+<tr>
+<td>ARM GCC</td>
+<td>13.x+</td>
+<td><a target="_blank" rel="noopener" href="https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads">ARM 官网</a> → <code>bin\</code> 加入 PATH</td>
+</tr>
+<tr>
+<td>CMake</td>
+<td>≥ 3.13</td>
+<td><code>winget install Kitware.CMake</code></td>
+</tr>
+<tr>
+<td>Ninja</td>
+<td>任意</td>
+<td><code>winget install Ninja-build.Ninja</code></td>
+</tr>
+<tr>
+<td>TI MSPM0 SDK</td>
+<td>2.x</td>
+<td><a target="_blank" rel="noopener" href="https://www.ti.com/tool/MSPM0-SDK">下载</a> → 解压到 <code>C:\ti\</code></td>
+</tr>
+<tr>
+<td>TI SysConfig</td>
+<td>1.x</td>
+<td><a target="_blank" rel="noopener" href="https://www.ti.com/tool/SYSCONFIG">下载</a> → 解压到 <code>C:\ti\</code></td>
+</tr>
+<tr>
+<td>OpenOCD</td>
+<td>1.3.x</td>
+<td>PATH 发现 &#x2F; TI VSCode 插件（CMSIS-DAP&#x2F;XDS110 必装，JLink 可选）</td>
+</tr>
+<tr>
+<td>arm-none-eabi-gdb</td>
+<td>14.x</td>
+<td>PATH 发现 &#x2F; TI VSCode 插件</td>
+</tr>
+<tr>
+<td>JLink</td>
+<td>7.x+</td>
+<td><a target="_blank" rel="noopener" href="https://www.segger.com/downloads/jlink/">SEGGER 官网</a> → 自动加入 PATH（JLink 用户必装）</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>任意</td>
+<td><code>winget install --id Git.Git -e --source winget</code></td>
+</tr>
+</tbody></table>
+<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><table>
+<thead>
+<tr>
+<th>依赖</th>
+<th>版本</th>
+<th>安装方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python</td>
+<td>≥ 3.8</td>
+<td>系统自带 &#x2F; <code>sudo apt install python3</code></td>
+</tr>
+<tr>
+<td>ARM GCC</td>
+<td>13.x+</td>
+<td><code>sudo apt install gcc-arm-none-eabi</code></td>
+</tr>
+<tr>
+<td>CMake</td>
+<td>≥ 3.13</td>
+<td><code>sudo apt install cmake</code></td>
+</tr>
+<tr>
+<td>Ninja</td>
+<td>任意</td>
+<td><code>sudo apt install ninja-build</code></td>
+</tr>
+<tr>
+<td>TI MSPM0 SDK</td>
+<td>2.x</td>
+<td><a target="_blank" rel="noopener" href="https://www.ti.com/tool/MSPM0-SDK">下载</a> → 解压到 <code>~/ti/</code></td>
+</tr>
+<tr>
+<td>TI SysConfig</td>
+<td>1.x</td>
+<td><a target="_blank" rel="noopener" href="https://www.ti.com/tool/SYSCONFIG">下载</a> → 解压到 <code>~/ti/</code></td>
+</tr>
+<tr>
+<td>OpenOCD</td>
+<td>1.3.x</td>
+<td>PATH 发现 &#x2F; TI VSCode 插件（CMSIS-DAP&#x2F;XDS110 必装，JLink 可选）</td>
+</tr>
+<tr>
+<td>arm-none-eabi-gdb</td>
+<td>14.x</td>
+<td>PATH 发现 &#x2F; <code>apt install gdb-multiarch</code></td>
+</tr>
+<tr>
+<td>JLink</td>
+<td>7.x+</td>
+<td><a target="_blank" rel="noopener" href="https://www.segger.com/downloads/jlink/">SEGGER 官网</a> → <code>.deb</code> 或解压到 <code>/opt/</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="CLI-快速索引"><a href="#CLI-快速索引" class="headerlink" title="CLI 快速索引"></a>CLI 快速索引</h2><h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init                                    <span class="comment"># 自动发现 .syscfg，原地创建</span></span><br><span class="line">mspm0-init new -n my_project                  <span class="comment"># 指定项目名</span></span><br><span class="line">mspm0-init new myboard.syscfg -n proj -d xds110  <span class="comment"># 完整指定</span></span><br><span class="line">mspm0-init new --device MSPM0G3507 --package <span class="string">&quot;LQFP-48(PT)&quot;</span> -n bare  <span class="comment"># 无 syscfg</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="重新生成"><a href="#重新生成" class="headerlink" title="重新生成"></a>重新生成</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init regenerate                         <span class="comment"># 项目目录内执行</span></span><br><span class="line">mspm0-init regenerate /path/to/proj           <span class="comment"># 指定路径</span></span><br><span class="line">mspm0-init regenerate -d jlink                <span class="comment"># 更换调试器</span></span><br><span class="line">mspm0-init regenerate -d none                 <span class="comment"># 移除调试器</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="自检"><a href="#自检" class="headerlink" title="自检"></a>自检</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init --check                            <span class="comment"># 环境诊断</span></span><br><span class="line">mspm0-init --version                          <span class="comment"># 版本号</span></span><br><span class="line">mspm0-init --<span class="built_in">help</span>                             <span class="comment"># 完整帮助</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="全部参数"><a href="#全部参数" class="headerlink" title="全部参数"></a>全部参数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init new [syscfg] -n NAME [选项]</span><br><span class="line"></span><br><span class="line">  -n, --name NAME        项目名称（必填）</span><br><span class="line">  -o, --output DIR       输出目录</span><br><span class="line">  -s, --sdk PATH         MSPM0 SDK 路径</span><br><span class="line">  --sysconfig PATH       SysConfig 安装目录</span><br><span class="line">  -d, --debugger TYPE    cmsis-dap（默认）| xds110 | jlink | none</span><br><span class="line">  --jlink-path PATH      JLink 安装路径</span><br><span class="line">  --device DEVICE        手动指定芯片型号</span><br><span class="line">  --package PACKAGE      手动指定封装</span><br><span class="line">  --dry-run              预览模式，不创建文件</span><br><span class="line">  --no-build             跳过构建验证</span><br><span class="line">  --no-git               跳过 Git 初始化</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><p><strong>全部可选</strong>。不设置时 TPA 从 PATH 自动发现。</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>Windows 默认值</th>
+<th>Linux 默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>MSPM0_SDK</code></td>
+<td><code>C:\ti\mspm0_sdk_*</code></td>
+<td><code>~/ti/mspm0_sdk_*</code></td>
+<td>SDK 根目录</td>
+</tr>
+<tr>
+<td><code>SYSCONFIG_DIR</code></td>
+<td><code>C:\ti\sysconfig_*</code></td>
+<td><code>~/ti/sysconfig_*</code></td>
+<td>SysConfig 目录</td>
+</tr>
+<tr>
+<td><code>TI_ROOT</code></td>
+<td><code>C:\ti</code></td>
+<td><code>~/ti</code></td>
+<td>TI 工具根目录</td>
+</tr>
+<tr>
+<td><code>OPENOCD_DIR</code></td>
+<td>PATH → TI 插件缓存</td>
+<td>PATH → <code>~/.config/...</code></td>
+<td>OpenOCD 目录</td>
+</tr>
+<tr>
+<td><code>GDB_DIR</code></td>
+<td>PATH → TI 插件缓存</td>
+<td>PATH → <code>~/.config/...</code></td>
+<td>GDB 目录</td>
+</tr>
+<tr>
+<td><code>JLINK_DIR</code></td>
+<td>PATH → <code>C:\Program Files\SEGGER\JLink</code></td>
+<td>PATH → <code>/opt/SEGGER/JLink*</code></td>
+<td>JLink 目录</td>
+</tr>
+</tbody></table>
+<h3 id="工具解析优先级"><a href="#工具解析优先级" class="headerlink" title="工具解析优先级"></a>工具解析优先级</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. CLI 参数          (--openocd / --gdb / --jlink-path)    ← 最高优先级</span><br><span class="line">2. 环境变量          (OPENOCD_DIR / GDB_DIR / JLINK_DIR)</span><br><span class="line">3. PATH              (shutil.which)                         ← 推荐方式</span><br><span class="line">4. TI 插件缓存       (~\.config\Texas Instruments\...)</span><br><span class="line">5. 遗留路径          (TI_ROOT / CCS_BASE)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="生成的项目结构"><a href="#生成的项目结构" class="headerlink" title="生成的项目结构"></a>生成的项目结构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">my_project/</span><br><span class="line">├── CMakeLists.txt</span><br><span class="line">├── .gitignore</span><br><span class="line">├── my_project.syscfg           # 原始 SysConfig 配置</span><br><span class="line">├── config/                     # 自动生成 — 请勿手动编辑</span><br><span class="line">│   ├── ti_msp_dl_config.h</span><br><span class="line">│   ├── ti_msp_dl_config.c</span><br><span class="line">│   ├── device_linker.lds</span><br><span class="line">│   └── device.opt</span><br><span class="line">├── inc/                        # 头文件</span><br><span class="line">│   ├── main.h</span><br><span class="line">│   ├── app/                    # 应用层</span><br><span class="line">│   ├── driver/                 # 驱动</span><br><span class="line">│   ├── modules/                # 功能模块</span><br><span class="line">│   └── utils/                  # 工具</span><br><span class="line">├── src/                        # 源码（在此写代码）</span><br><span class="line">│   ├── main.c</span><br><span class="line">│   ├── app/</span><br><span class="line">│   ├── driver/</span><br><span class="line">│   ├── modules/</span><br><span class="line">│   └── utils/</span><br><span class="line">├── lib/                        # 本地静态库</span><br><span class="line">├── excluded/                   # 不参与编译的产物</span><br><span class="line">├── build/                      # 构建输出（ELF/HEX/BIN/MAP）</span><br><span class="line">└── .vscode/</span><br><span class="line">    ├── launch.json             # 调试配置</span><br><span class="line">    ├── tasks.json              # 构建 + SysConfig + Flash</span><br><span class="line">    ├── settings.json           # Task Buttons 状态栏按钮</span><br><span class="line">    └── c_cpp_properties.json   # IntelliSense</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="依赖关系"><a href="#依赖关系" class="headerlink" title="依赖关系"></a>依赖关系</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mspm0-init</span><br><span class="line">├── SysConfig 1.x ────────────── 生成 ti_msp_dl_config.c/h、链接脚本</span><br><span class="line">├── MSPM0 SDK 2.x</span><br><span class="line">│   ├── driverlib.a ──────────── 硬件抽象层</span><br><span class="line">│   ├── startup_*.c ──────────── 中断向量表 + 启动代码</span><br><span class="line">│   ├── CMSIS Core ───────────── Cortex-M0+ 寄存器定义</span><br><span class="line">│   └── DeviceFamily.h ──────── 芯片系列宏（58 款芯片动态发现）</span><br><span class="line">├── arm-none-eabi-gcc ────────── 交叉编译</span><br><span class="line">├── CMake + Ninja ───────────── 构建系统</span><br><span class="line">├── OpenOCD (可选) ──────────── GDB Server + 烧录（cmsis-dap / xds110 必装）</span><br><span class="line">├── JLink 7.x+ (可选) ───────── 原生 GDB Server + 烧录（jlink 模式，≥ 7.70）</span><br><span class="line">├── arm-none-eabi-gdb ────────── 源码级调试</span><br><span class="line">├── Git ──────────────────────── 版本控制</span><br><span class="line">└── VS Code + Cortex-Debug ──── IDE 集成</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="支持的芯片"><a href="#支持的芯片" class="headerlink" title="支持的芯片"></a>支持的芯片</h2><p><strong>SDK 中的全部 58 款 MSPM0 芯片开箱即用。</strong> TPA 通过运行时解析 SDK 自动发现芯片参数，无需手动添加型号。</p>
+<table>
+<thead>
+<tr>
+<th>系列</th>
+<th>代表型号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MSPM0Gx5xx</td>
+<td>G3507, G3519, G3107, G1507, G1519 …</td>
+</tr>
+<tr>
+<td>MSPM0Gx1xx</td>
+<td>G1105, G1106 …</td>
+</tr>
+<tr>
+<td>MSPM0Lx3xx</td>
+<td>L1306, L1345, L2228 …</td>
+</tr>
+<tr>
+<td>MSPM0Lx2xx</td>
+<td>L1227, L2227, L1228 …</td>
+</tr>
+<tr>
+<td>MSPM0Cx1xx</td>
+<td>C1105, C1106 …</td>
+</tr>
+<tr>
+<td>MSPM0Hx2xx</td>
+<td>H3215 …</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="📖-详细教程"><a href="#📖-详细教程" class="headerlink" title="📖 详细教程"></a>📖 详细教程</h2><p>本文档是快速索引参考。如需<strong>完整的手把手教程</strong>（含碎碎念、环境变量图形配置指南、Linux udev 规则、常见问题排查等），请参阅：</p>
+<blockquote>
+<p>👉 <a href="/2026/07/11/Ti-Project-Assistant%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/"><strong>Ti-Project-Assistant 使用教程</strong></a></p>
+</blockquote>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harekasa</div><div class="author-info-description">Harekasa的个人博客，分享技术、生活和兴趣爱好。</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/andyyang12345"><i class="fab fa-github"></i><span>OMG its me  !</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/AndyYang12345" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:eeysy_harekasa@mail.scut.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/12/TPA%E6%95%99%E5%AD%A6%E8%A7%86%E9%A2%91%E7%A8%BF%E5%AD%90/" title="TPA教学视频稿子">TPA教学视频稿子</a><time datetime="2026-07-11T17:47:51.000Z" title="Created 2026-07-12 01:47:51">2026-07-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/11/Ti-Project-Assistant%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="Ti-Project-Assistant使用教程">Ti-Project-Assistant使用教程</a><time datetime="2026-07-11T12:30:00.000Z" title="Created 2026-07-11 20:30:00">2026-07-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/GPT-SoVits%E7%9A%84%E9%83%A8%E7%BD%B2/" title="GPT-SoVits的部署">GPT-SoVits的部署</a><time datetime="2026-05-30T02:09:38.000Z" title="Created 2026-05-30 10:09:38">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/28/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E5%9C%A8VSCode%E7%8E%AF%E5%A2%83%E5%9F%BA%E4%BA%8ESTM32Cube%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8DapLink%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95%E7%9A%84%E7%A0%94%E7%A9%B6/" title="关于如何在VSCode环境基于STM32Cube插件使用DapLink进行调试的研究">关于如何在VSCode环境基于STM32Cube插件使用DapLink进行调试的研究</a><time datetime="2026-04-28T08:04:27.000Z" title="Created 2026-04-28 16:04:27">2026-04-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/05/%E8%A1%8C%E4%B8%BA%E6%A0%91/" title="行为树">行为树</a><time datetime="2026-04-05T03:32:36.000Z" title="Created 2026-04-05 11:32:36">2026-04-05</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%90%8E%E7%AB%AF/"><span class="card-category-list-name">后端</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91/"><span class="card-category-list-name">嵌入式开发</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91/" style="font-size: 1.1em; color: #999">嵌入式开发</a> <a href="/tags/OpenOCD/" style="font-size: 1.1em; color: #999">OpenOCD</a> <a href="/tags/TI/" style="font-size: 1.1em; color: #999">TI</a> <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 1.1em; color: #999">嵌入式</a> <a href="/tags/MSPM0/" style="font-size: 1.1em; color: #999">MSPM0</a> <a href="/tags/VSCode/" style="font-size: 1.5em; color: #99a9bf">VSCode</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%90%AD%E5%BB%BA/" style="font-size: 1.1em; color: #999">服务器搭建</a> <a href="/tags/GPT-SoVits/" style="font-size: 1.1em; color: #999">GPT-SoVits</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" style="font-size: 1.1em; color: #999">环境部署</a> <a href="/tags/DapLink/" style="font-size: 1.1em; color: #999">DapLink</a> <a href="/tags/STM32/" style="font-size: 1.1em; color: #999">STM32</a> <a href="/tags/SysConfig/" style="font-size: 1.1em; color: #999">SysConfig</a> <a href="/tags/CMake/" style="font-size: 1.1em; color: #999">CMake</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/07/">
+            <span class="card-archive-list-date">
+              July 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/05/">
+            <span class="card-archive-list-date">
+              May 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/04/">
+            <span class="card-archive-list-date">
+              April 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">5</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">15.7k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-07-15T17:20:13.074Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/top_image.jpg);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harekasa</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div><div class="footer_custom_text">我始终如一 ~</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="translateLink" type="button" title="Toggle Between Traditional and Simplified Chinese">繁</button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><script src="/js/TabName.js"></script><script src="/js/tag-colorizer.js"></script><script type="module" src="/js/three-hero.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="80" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
