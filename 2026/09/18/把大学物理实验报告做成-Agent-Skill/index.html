@@ -1,0 +1,325 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>把大学物理实验报告做成 Agent Skill | Ciallo(∠・ω&lt; )⌒☆</title><meta name="author" content="Harekasa"><meta name="copyright" content="Harekasa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F5F0FF"><meta name="description" content="把大学物理实验报告做成 Agent Skill 文中姓名、学号、座位号等个人信息均以占位符代替；实验报告的模板与格式要求，请以学校当期发布为准。工作流仅作学习使用，鼓励所有同学在遵守学校规定的前提下，探索适合自己的自动化工具。严肃反对任何学术不端行为。  1.问题提出大学物理实验这门课有件事很磨人：每做一次实验就要交一份格式完全固定的报告。而且不是交一次就完事——上课前交预习报告，做完实验把原始数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="把大学物理实验报告做成 Agent Skill">
+<meta property="og:url" content="https://andyyang12345.github.io/2026/09/18/%E6%8A%8A%E5%A4%A7%E5%AD%A6%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A%E5%81%9A%E6%88%90-Agent-Skill/index.html">
+<meta property="og:site_name" content="Ciallo(∠・ω&lt; )⌒☆">
+<meta property="og:description" content="把大学物理实验报告做成 Agent Skill 文中姓名、学号、座位号等个人信息均以占位符代替；实验报告的模板与格式要求，请以学校当期发布为准。工作流仅作学习使用，鼓励所有同学在遵守学校规定的前提下，探索适合自己的自动化工具。严肃反对任何学术不端行为。  1.问题提出大学物理实验这门课有件事很磨人：每做一次实验就要交一份格式完全固定的报告。而且不是交一次就完事——上课前交预习报告，做完实验把原始数">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://andyyang12345.github.io/img/github-profile.png">
+<meta property="article:published_time" content="2026-09-18T12:11:29.000Z">
+<meta property="article:modified_time" content="2026-09-19T03:58:32.245Z">
+<meta property="article:author" content="Harekasa">
+<meta property="article:tag" content="Agent Skill">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="docx">
+<meta property="article:tag" content="物理实验">
+<meta property="article:tag" content="自动化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://andyyang12345.github.io/img/github-profile.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "把大学物理实验报告做成 Agent Skill",
+  "url": "https://andyyang12345.github.io/2026/09/18/%E6%8A%8A%E5%A4%A7%E5%AD%A6%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A%E5%81%9A%E6%88%90-Agent-Skill/",
+  "image": "https://andyyang12345.github.io/img/github-profile.png",
+  "datePublished": "2026-09-18T12:11:29.000Z",
+  "dateModified": "2026-09-19T03:58:32.245Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harekasa",
+      "url": "https://github.com/AndyYang12345"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/prts-512x512.png"><link rel="canonical" href="https://andyyang12345.github.io/2026/09/18/%E6%8A%8A%E5%A4%A7%E5%AD%A6%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A%E5%81%9A%E6%88%90-Agent-Skill/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A2438')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F5F0FF')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '把大学物理实验报告做成 Agent Skill',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">40</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_image.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Ciallo(∠・ω&lt; )⌒☆</span></a><a class="nav-page-title" href="/"><span class="site-name">把大学物理实验报告做成 Agent Skill</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">把大学物理实验报告做成 Agent Skill</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-09-18T12:11:29.000Z" title="Created 2026-09-18 20:11:29">2026-09-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-09-19T03:58:32.245Z" title="Updated 2026-09-19 11:58:32">2026-09-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI%E5%B7%A5%E5%85%B7/">AI工具</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">3.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>11mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="把大学物理实验报告做成-Agent-Skill"><a href="#把大学物理实验报告做成-Agent-Skill" class="headerlink" title="把大学物理实验报告做成 Agent Skill"></a>把大学物理实验报告做成 Agent Skill</h1><blockquote>
+<p>文中姓名、学号、座位号等个人信息均以占位符代替；实验报告的模板与格式要求，请以学校当期发布为准。工作流仅作学习使用，鼓励所有同学在遵守学校规定的前提下，探索适合自己的自动化工具。严肃反对任何学术不端行为。</p>
+</blockquote>
+<h2 id="1-问题提出"><a href="#1-问题提出" class="headerlink" title="1.问题提出"></a>1.问题提出</h2><p>大学物理实验这门课有件事很磨人：<strong>每做一次实验就要交一份格式完全固定的报告</strong>。而且不是交一次就完事——上课前交预习报告，做完实验把原始数据填进记录表，最后合成 PDF 提交。</p>
+<p>拆开看，每次的重复劳动是这么几块：</p>
+<ul>
+<li><strong>个人信息</strong>：封面 5 项（课程名称&#x2F;姓名&#x2F;学号&#x2F;专业班级&#x2F;开课学期），正文信息行 6 项（实验日期&#x2F;姓名&#x2F;座位号&#x2F;实验时段&#x2F;专业&#x2F;指导老师）。每次都要重敲。</li>
+<li><strong>正文</strong>：实验目的、实验仪器、实验原理、实验操作步骤。结构固定，内容随实验变。</li>
+<li><strong>原理图</strong>：老师明确要求配图。</li>
+<li><strong>原始数据</strong>：实验结束后照抄仪器读数，还要保证两游标读数差、偏向角这些关系自洽。</li>
+<li><strong>格式</strong>：模板里用红字写着“正文宋体，小四号，1.5 倍行距”，Word 里每次都得再确认一遍没跑偏。</li>
+<li><strong>命名</strong>：交上去的文件必须叫 <code>&lt;座位号&gt;-&lt;姓名&gt;-&lt;实验名称&gt;.pdf</code>。</li>
+</ul>
+<p>手工做一次，从整理内容到排版导出，一个小时起步。一学期十来次实验，就是十几个小时花在排版上。</p>
+<p>所以我给它写了一个 Agent Skill。</p>
+<h2 id="2-先把“规范”从模板里挖出来"><a href="#2-先把“规范”从模板里挖出来" class="headerlink" title="2.先把“规范”从模板里挖出来"></a>2.先把“规范”从模板里挖出来</h2><p>写 Skill 的第一个坑，是<strong>急着写 prompt，而不是先把规范读明白</strong>。</p>
+<p>学校发的 <code>实验报告模板2026秋.docx</code> 里有一堆红色文字。第一次看会以为那是“待填内容”，其实它们是<strong>排版说明</strong>——老师把要求直接写在模板里了。全篇一共 5 处：</p>
+<table>
+<thead>
+<tr>
+<th>红字内容</th>
+<th>实际含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>8.12 用双光栅测量微弱振动位移</code></td>
+<td>示例实验名，不是让你做这个</td>
+</tr>
+<tr>
+<td><code>（红色为式样或说明，自行删除）</code></td>
+<td>红字全部要删掉</td>
+</tr>
+<tr>
+<td><code>（正文宋体，小四号，1.5倍行距）</code></td>
+<td><strong>正文格式要求</strong></td>
+</tr>
+<tr>
+<td><code>（位置不够，可自行加页）</code> ×2</td>
+<td>内容超页可以加页</td>
+</tr>
+</tbody></table>
+<p>也就是说，<strong>格式规范不在任何一份单独的文档里写着，它藏在模板的红字批注里</strong>。如果不先把模板拆开读一遍，Skill 里根本不知道该用什么字号。</p>
+<p>于是第一步不是写代码，是<strong>做一份干净模板</strong>：删掉全部红字，删掉那个已经不需要的栏目，留下 3 张表（封面、正文、原始数据记录表）。这份干净模板成为后面所有生成的基线。</p>
+<p>这一步还顺手修了个矛盾：模板的“实验报告撰写要求”页写着“完整报告 &#x3D; 预习 + 数据记录 + 课后处理三部分”，但既然报告里不再需要课后数据处理，那两句话留着就是自相矛盾，一并删掉。</p>
+<h2 id="3-工作流：两种模式，一份-profile"><a href="#3-工作流：两种模式，一份-profile" class="headerlink" title="3.工作流：两种模式，一份 .profile"></a>3.工作流：两种模式，一份 .profile</h2><p>报告的生命周期天然分成两段，Skill 也就设计成两种模式：</p>
+<p><strong>预习模式</strong>（上课前，我给实验名称）</p>
+<ol>
+<li>读 <code>.profile</code> 取个人信息，<strong>缺字段必须先问，不许猜</strong></li>
+<li>确认实验名称——这一步不能省，后面细说</li>
+<li>画原理图</li>
+<li>生成报告 docx：封面 + 信息行 + 目的&#x2F;仪器&#x2F;原理&#x2F;操作步骤 + 插图</li>
+<li>导出 PDF 到 <code>提交/</code></li>
+</ol>
+<p><strong>数据模式</strong>（实验后，我把仪器读数发过去）</p>
+<ol>
+<li>转录数据，逐格核对</li>
+<li><strong>自洽性校核</strong>：分光计两游标读数差应约等于 180°；偏向角 δ 应约等于两游标各自算出的 |α₁−α₂| 的平均值。对不上就报出来，<strong>不擅自改数据</strong></li>
+<li>填实验日期 + 原始数据记录表</li>
+<li>重新导出 PDF，同名覆盖</li>
+</ol>
+<p>个人信息单独抽成一份 <code>~/物理实验报告/.profile</code>，纯文本 <code>键: 值</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">姓名: &lt;姓名&gt;</span><br><span class="line">学号: &lt;学号&gt;</span><br><span class="line">座位号: &lt;座位号&gt;</span><br><span class="line">专业班级: &lt;班级&gt;</span><br><span class="line">指导老师: &lt;老师&gt;</span><br><span class="line">实验时段: &lt;时段&gt;</span><br></pre></td></tr></table></figure>
+
+<p>它是<strong>唯一信息源</strong>。Skill 每次重新读，字段缺失就停下来问，绝不在报告里硬编码——不然换学期、换老师就要满仓库改。</p>
+<p>几个约定也定死在这一层：</p>
+<ul>
+<li><strong>只保留最终稿</strong>，预习稿和终稿同名，直接覆盖，不做版本管理；</li>
+<li><strong>实验日期在实验后才填</strong>，预习阶段该栏留空；</li>
+<li>提交文件名固定 <code>&lt;座位号&gt;-&lt;姓名&gt;-&lt;实验名称&gt;.pdf</code>。</li>
+</ul>
+<h2 id="4-原理图必须自己画"><a href="#4-原理图必须自己画" class="headerlink" title="4.原理图必须自己画"></a>4.原理图必须自己画</h2><p>老师要求配图，第一反应是去网上找。我放弃了这条路，理由有三条：</p>
+<ol>
+<li><strong>版权不明</strong>——教学 PPT 里的图多半有出处，公开博客上挂着不合适；</li>
+<li><strong>分辨率不可控</strong>——截图放大就糊，打印出来更糟；</li>
+<li><strong>符号系统对不上</strong>——网图里的角度标记、变量名往往和我的正文公式不一致。</li>
+</ol>
+<p>最重要的是第三条。自己画能保证<strong>图里的几何量和正文公式严格自洽</strong>。最小偏向角那张图就是典型：正文写 <code>n = sin[(A + δmin)/2] / sin(A/2)</code>，那张图里就不能随便画个角度了事。我是先按 <code>A = 60°</code>、<code>n = 1.6</code> 反解出 <code>r = 30°</code>、<code>i = 53.13°</code>、<code>δmin = 46.26°</code>，再把这些数代进去画线，脚本运行时还会把这三个值打印出来核对。</p>
+<p>于是我把绘图封装成一个 <code>figstyle.py</code>，基于 matplotlib，提供 <code>line / dashed / arrow / mid_arrow / poly / circle / arc / angle / angle_dim / right_angle / text / leader</code> 这些图元。几个设计上的取舍：</p>
+<ul>
+<li><strong>坐标一律 y 轴向上</strong>，角度用度、逆时针为正——和数学课本一致，写公式时不用做心算转换；</li>
+<li><strong><code>mid_arrow</code> 把箭头放在线段中段</strong>，而不是顶点。光路图里有入射点、出射点这种多线交汇的顶点，箭头堆在那里会糊成一团；</li>
+<li><strong><code>leader(目标点, 文字位置, 文字)</code> 自动加引线和小圆点</strong>，结构图的标注不用手算偏移；</li>
+<li>参考文档里放<strong>两个可直接运行的完整范例</strong>（结构类图、光路类图），下次照着改就行。</li>
+</ul>
+<h2 id="5-工程上最值得记的几件事"><a href="#5-工程上最值得记的几件事" class="headerlink" title="5.工程上最值得记的几件事"></a>5.工程上最值得记的几件事</h2><h3 id="5-1-docx-不是普通文档格式"><a href="#5-1-docx-不是普通文档格式" class="headerlink" title="5.1 docx 不是普通文档格式"></a>5.1 docx 不是普通文档格式</h3><p>我第一版是直接改 OOXML 的，踩了一串坑：</p>
+<ul>
+<li><strong>中文字体必须同时设 <code>w:eastAsia</code></strong>。只设 <code>ascii</code>&#x2F;<code>hAnsi</code>，中文会回落成默认字体，你以为设了宋体其实没设；</li>
+<li><strong>下标必须用 <code>vertAlign</code></strong>，不能用 Unicode 下标字符 <code>₁₂₀</code>。宋体缺这些字形，Word 里会显示成方框。表格里的 α₁、δ₀ 全中招；</li>
+<li><strong><code>rPr</code> 子元素的顺序受 <code>CT_RPr</code> schema 约束</strong>：<code>rFonts → b → bCs → sz → szCs → vertAlign → u</code>。顺序错了严格的校验器直接报错；</li>
+<li><strong>表格边框 python-docx 没有 API</strong>，只能塞 XML。</li>
+</ul>
+<p>结论很简单：<strong>别手搓 OOXML，用 python-docx 把格式封装起来</strong>。<code>style_run()</code> 和 <code>cell_para()</code> 两个函数吃掉了上面所有坑，Skill 层只写“这段是加粗标题、这段是正文”，不碰底层。</p>
+<h3 id="5-2-定位锚点不能用正文内容"><a href="#5-2-定位锚点不能用正文内容" class="headerlink" title="5.2 定位锚点不能用正文内容"></a>5.2 定位锚点不能用正文内容</h3><p>这是我犯的一个设计错误。第一版插图时，我是按正文句子定位的——“找到以『分光计由望远镜、平行光管』开头的段落，把图插在它后面”。</p>
+<p>这在当次实验里能跑通，但<strong>换个实验就完全失效</strong>，因为正文是每次生成的，根本不能当锚点。</p>
+<p>正确做法是<strong>只用模板自带的固定标签定位</strong>：<code>实验日期：</code>、<code>实验时段：</code>、<code>实验目的：</code>、<code>原始数据记录表</code>……这些标签在任何一次实验里都在同一个位置。正文表也靠 <code>cell(0,0)</code> 文本以“实验目的”开头来识别。</p>
+<p>一句话：<strong>锚点必须来自不变量，不能来自变量。</strong></p>
+<h3 id="5-3-别和坏掉的依赖较劲"><a href="#5-3-别和坏掉的依赖较劲" class="headerlink" title="5.3 别和坏掉的依赖较劲"></a>5.3 别和坏掉的依赖较劲</h3><p>系统 Python 里的 matplotlib 是坏的——报 <code>numpy.core.multiarray failed to import</code>，典型的 numpy 2.x 与旧 matplotlib 二进制不兼容。我一开始用 Pillow 手绘绕过去了，能画但很别扭：弧线、箭头、字体都要自己算。</p>
+<p>后来干脆建了专用环境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">conda create -n physlab -y -c conda-forge \</span><br><span class="line">  python=3.12 python-docx pillow matplotlib numpy</span><br></pre></td></tr></table></figure>
+
+<p>一次解决，之后画图直接用 matplotlib，代码短了一半。<strong>遇到环境问题，“绕过去”往往比“修好它”更贵。</strong></p>
+<h3 id="5-4-排版是玄学，必须目视"><a href="#5-4-排版是玄学，必须目视" class="headerlink" title="5.4 排版是玄学，必须目视"></a>5.4 排版是玄学，必须目视</h3><p>有两个坑，代码层面完全正确，渲染出来就是不对：</p>
+<p><strong>一是 LibreOffice 不认表格单元格里的“与下段同页”。</strong> python-docx 的 <code>keep_with_next</code> 写进去了，Word 里有效，但 LibreOffice 转 PDF 时照样把插图和题注拆到两页。解决办法只能是<strong>导出后把 PDF 转成图片目视核对</strong>，发现拆页就把图宽缩 0.5cm 重来。</p>
+<p><strong>二是记录表那个 21cm 的大格。</strong> 模板里原始数据记录表最后一行是“至少 21cm”，留白给手写。但数据是打进去的，这一行加上前面的表头就超出一页，结果<strong>表头留在上一页、数据跑到下一页</strong>。改成 15cm 自适应，并在记录表标题上加 <code>page_break_before</code>，整张表才稳定落在独立一页。</p>
+<p>这两件事教会我一件事：<strong>排版正确性没法靠单元测试保证，只能看。</strong></p>
+<h3 id="5-5-matplotlib-的两个小坑"><a href="#5-5-matplotlib-的两个小坑" class="headerlink" title="5.5 matplotlib 的两个小坑"></a>5.5 matplotlib 的两个小坑</h3><p>顺手记两个绘图细节：</p>
+<ul>
+<li><strong>画布长宽比要等于数据范围的长宽比</strong>，即 <code>h/w = Δy/Δx</code>。否则 <code>aspect=&#39;equal&#39;</code> 会在图里留出大片空白边，插进文档后图显得特别小。我那两张光路图一开始四周全是白边，就是这个原因；</li>
+<li><strong><code>dot()</code> 的半径别用 points</strong>。我最初用 <code>marker=&#39;o&#39;, ms=r*260</code>，<code>ms</code> 是 points 而 <code>r</code> 是数据坐标，换个坐标范围点的大小就失控——第一版结构图上所有引线端点全变成了大黑疙瘩。改成 <code>matplotlib.patches.Circle</code>、半径用数据坐标才对。</li>
+</ul>
+<h2 id="6-实测暴露的两个真-bug"><a href="#6-实测暴露的两个真-bug" class="headerlink" title="6.实测暴露的两个真 bug"></a>6.实测暴露的两个真 bug</h2><p>这部分我想单独说，因为它推翻了我对“写完了”的判断。</p>
+<p>Skill 的脚本写完之后，我做了一次<strong>从零重建</strong>：删掉中间产物，用干净模板 + <code>spec.json</code> + <code>data.json</code> 把整份报告重新跑一遍。结果暴露出两个静态检查发现不了的问题：</p>
+<ol>
+<li><strong><code>build</code> 阶段漏填原始数据记录表的“实验名称”和“姓名”。</strong> 之前那份能对，是因为我在更早的手工流程里填过，脚本本身根本没写这段逻辑；</li>
+<li><strong>大格行高导致记录表拆页</strong>（就是 5.4 里那个）。</li>
+</ol>
+<p>如果我只看“当前这份报告是对的”就收工，这两个 bug 会一直潜伏到下一次实验才炸。</p>
+<p><strong>结论：Skill 写没写完，不看代码，看能不能从零跑通。</strong></p>
+<h2 id="7-目录纪律：提交区只能放最终产物"><a href="#7-目录纪律：提交区只能放最终产物" class="headerlink" title="7.目录纪律：提交区只能放最终产物"></a>7.目录纪律：提交区只能放最终产物</h2><p>项目结构是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">~/物理实验报告/</span><br><span class="line">├── .profile                     个人信息（唯一来源）</span><br><span class="line">├── README.md                    目录说明 + 纪律</span><br><span class="line">├── templates/                   干净模板 + 原始模板</span><br><span class="line">├── .build/&lt;名称&gt;/               所有中间产物（docx/图/脚本/json）</span><br><span class="line">└── 提交/&lt;座位号&gt;-&lt;姓名&gt;-&lt;名称&gt;.pdf   最终交付</span><br></pre></td></tr></table></figure>
+
+<p>期间出了个小插曲：同一台机器上另一个 agent 不知道这套约定，把 <code>.docx</code> 和一张调试用的 <code>.png</code> 丢进了 <code>提交/</code>。</p>
+<p>这类问题的根因不是“文件放错了”，而是<strong>约定只存在于我脑子里</strong>。所以补了三处：</p>
+<ul>
+<li><code>SKILL.md</code> 里写明“提交区纪律”，并说明<strong>非实验类作业（比如绪论作业）走同一套约定</strong>；</li>
+<li>在 <code>~/物理实验报告/README.md</code> 写清目录树、三条纪律、命令速查，任何 agent 进来先看这个；</li>
+<li>检查脚本里加一条：<code>ls 提交/</code> 出现非 PDF 就报警。</li>
+</ul>
+<p>顺便还发现那个 agent 的生成脚本第 27 行写着 <code>OUT = os.path.join(ROOT, &quot;提交&quot;, &quot;xxx.docx&quot;)</code>——<strong>它把 docx 直接写进提交区</strong>。这才是文件跑错地方的真正源头。改掉输出路径，问题从根上没了。</p>
+<h2 id="8-结语"><a href="#8-结语" class="headerlink" title="8.结语"></a>8.结语</h2><p>这个 Skill 最终的形态是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">physics-lab-report/</span><br><span class="line">├── SKILL.md              工作流 + 硬规则 + 已知坑</span><br><span class="line">├── scripts/</span><br><span class="line">│   ├── labkit.py         docx 操作库（格式、锚点、表格、导出、自检）</span><br><span class="line">│   ├── lab.py            命令行入口（profile/build/data/export/check）</span><br><span class="line">│   └── figstyle.py       原理图绘制库</span><br><span class="line">└── reference/</span><br><span class="line">    ├── format.md         模板结构、锚点位置、字段对照</span><br><span class="line">    └── figures.md        绘图指南 + 两个可运行范例</span><br></pre></td></tr></table></figure>
+
+<p>用起来就是五条命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lab.py profile                             <span class="comment"># 看个人信息缺什么</span></span><br><span class="line">lab.py build  .build/&lt;名称&gt;/spec.json      <span class="comment"># 预习模式：生成报告</span></span><br><span class="line">lab.py data   .build/&lt;名称&gt;/data.json      <span class="comment"># 数据模式：填日期与原始数据</span></span><br><span class="line">lab.py <span class="built_in">export</span> <span class="string">&quot;&lt;实验名称&gt;&quot;</span>                  <span class="comment"># 导出 PDF 到 提交/</span></span><br><span class="line">lab.py check  <span class="string">&quot;&lt;实验名称&gt;&quot;</span> --figs 3         <span class="comment"># 交付前自检</span></span><br></pre></td></tr></table></figure>
+
+<p>回头看，真正有价值的不只是“省下十几个小时”，而是几条可以搬到别的项目上的经验：</p>
+<ul>
+<li><strong>规范常常藏在文档里而不是文档外</strong>——先读模板，再写 prompt；</li>
+<li><strong>锚点要来自不变量</strong>——用固定标签定位，别用会变的内容；</li>
+<li><strong>能自己生成的图就别去网上找</strong>——可控、自洽、没版权问题；</li>
+<li><strong>Skill 的验收标准是从零跑通</strong>，不是“这次结果是好的”；</li>
+<li><strong>约定要写下来</strong>，否则下一个 agent（或者三个月后的自己）一定会踩。</li>
+</ul>
+<blockquote>
+<p><strong>署名</strong></p>
+<ul>
+<li>实际作者：<strong>DeepSeekV41Flash</strong>（本文由 AI 生成）</li>
+<li>参与编辑：<strong>Harekasa</strong>（人工审核校对）</li>
+<li>日期：2026-09-18</li>
+</ul>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://github.com/AndyYang12345">Harekasa</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://andyyang12345.github.io/2026/09/18/%E6%8A%8A%E5%A4%A7%E5%AD%A6%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A%E5%81%9A%E6%88%90-Agent-Skill/">https://andyyang12345.github.io/2026/09/18/把大学物理实验报告做成-Agent-Skill/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Agent-Skill/">Agent Skill</a><a class="post-meta__tags" href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化</a><a class="post-meta__tags" href="/tags/%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C/">物理实验</a><a class="post-meta__tags" href="/tags/Python/">Python</a><a class="post-meta__tags" href="/tags/docx/">docx</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/09/18/%E6%A0%A1%E5%9B%AD%E7%BD%91-Dr-COM-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%83%A8%E7%BD%B2%E4%B8%8E-11-GB-syslog-%E6%B2%BB%E7%90%86/" title="校园网 Dr.COM 客户端部署与 11 GB syslog 治理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">校园网 Dr.COM 客户端部署与 11 GB syslog 治理</div></div><div class="info-2"><div class="info-item-1">校园网 Dr.COM 客户端部署与 11 GB syslog 治理 文中账号、密码、MAC 均以占位符代替，静态地址为示意值；请以自己登记到的信息为准。  1.问题提出学校学生宿舍的有线网使用基于 Dr.COM 的认证。Windows 下只要装上那个蓝绿色的官方客户端（Drcom）就能登录，但这套客户端只有 Windows 版，Linux 上没有对应程序。于是出现了一个很具体的困境：网络登记照做、静态地址照填，可就是在 Linux 里连不上。 我按学校流程做了三件事：在线上登记房间端口号（每个网口对应一个专属号）、绑定自己的校园网账号、填写电脑的 MAC 地址，随后拿到了一组静态 IPv4 地址和学校 DNS。在 Windows 上把这套地址配好、再打开 Dr.COM 客户端，认证就能通过。问题在于，我日常的开发环境是 Ubuntu，不可能为了一次认证单独留在 Windows 里。 后来在学长的社团论坛帖里看到，他们维护着一个开源项目 scutclient，专门在 Linux 上复刻这套认证流程。这篇文章记录的就是从发现它，到把它跑通、做成开机自启服务，最后治理它带来的日志问题的...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/08/06/%E4%BB%8E%E4%B8%80%E5%B0%81%E9%82%AE%E4%BB%B6%E5%BC%80%E5%A7%8B%EF%BC%9A%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA-Agent-Skill-%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/" title="从一封邮件开始：我的第一个 Agent Skill 开发记录"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-06</div><div class="info-item-2">从一封邮件开始：我的第一个 Agent Skill 开发记录</div></div><div class="info-2"><div class="info-item-1">从一封邮件开始：我的第一个 Agent Skill 开发记录项目地址：email-skills 1.前言最近注意到了一些关于邮件礼仪的讨论。虽然电子邮件已经是一个很老的工具，但在联系导师、投递简历、汇报工作或者发送正式材料时，很多人还是会在按下发送键之前反复纠结：主题应该怎么写？称呼要不要特别正式？抄送谁比较合适？附件文件名有没有讲究？催促对方会不会显得不礼貌？ 我最开始的想法很简单：既然这些问题具有比较固定的检查逻辑，能不能把它们整理成一个 Agent Skill，让 AI 在写邮件时自动遵循一套相对稳定的流程？ 于是就有了 email-skills。这是一个用于起草、检查和改写中英文电子邮件的小型 Skill，也是我第一次完整尝试 Skill 的设计、封装、安装和开源发布。 这个项目大概不会有很多用户。毕竟它解决的问题很窄，一份写得足够详细的 Prompt 也能完成其中不少工作。不过对我来说，它更像是一次从零开始的实验：借一个容易理解的场景，搞清楚 Agent Skill 到底是什么，以及一套个人工作流要怎样才能被稳定地交给另一个 AI 使用。 2.Skill 和 Promp...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harekasa</div><div class="author-info-description">Harekasa的个人博客，分享技术、生活和兴趣爱好。</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">40</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/andyyang12345"><i class="fab fa-github"></i><span>OMG its me  !</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/AndyYang12345" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:eeysy_harekasa@mail.scut.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8A%8A%E5%A4%A7%E5%AD%A6%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A%E5%81%9A%E6%88%90-Agent-Skill"><span class="toc-number">1.</span> <span class="toc-text">把大学物理实验报告做成 Agent Skill</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%97%AE%E9%A2%98%E6%8F%90%E5%87%BA"><span class="toc-number">1.1.</span> <span class="toc-text">1.问题提出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%85%88%E6%8A%8A%E2%80%9C%E8%A7%84%E8%8C%83%E2%80%9D%E4%BB%8E%E6%A8%A1%E6%9D%BF%E9%87%8C%E6%8C%96%E5%87%BA%E6%9D%A5"><span class="toc-number">1.2.</span> <span class="toc-text">2.先把“规范”从模板里挖出来</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%9A%E4%B8%A4%E7%A7%8D%E6%A8%A1%E5%BC%8F%EF%BC%8C%E4%B8%80%E4%BB%BD-profile"><span class="toc-number">1.3.</span> <span class="toc-text">3.工作流：两种模式，一份 .profile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%8E%9F%E7%90%86%E5%9B%BE%E5%BF%85%E9%A1%BB%E8%87%AA%E5%B7%B1%E7%94%BB"><span class="toc-number">1.4.</span> <span class="toc-text">4.原理图必须自己画</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%B7%A5%E7%A8%8B%E4%B8%8A%E6%9C%80%E5%80%BC%E5%BE%97%E8%AE%B0%E7%9A%84%E5%87%A0%E4%BB%B6%E4%BA%8B"><span class="toc-number">1.5.</span> <span class="toc-text">5.工程上最值得记的几件事</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-docx-%E4%B8%8D%E6%98%AF%E6%99%AE%E9%80%9A%E6%96%87%E6%A1%A3%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.5.1.</span> <span class="toc-text">5.1 docx 不是普通文档格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%AE%9A%E4%BD%8D%E9%94%9A%E7%82%B9%E4%B8%8D%E8%83%BD%E7%94%A8%E6%AD%A3%E6%96%87%E5%86%85%E5%AE%B9"><span class="toc-number">1.5.2.</span> <span class="toc-text">5.2 定位锚点不能用正文内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%88%AB%E5%92%8C%E5%9D%8F%E6%8E%89%E7%9A%84%E4%BE%9D%E8%B5%96%E8%BE%83%E5%8A%B2"><span class="toc-number">1.5.3.</span> <span class="toc-text">5.3 别和坏掉的依赖较劲</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E6%8E%92%E7%89%88%E6%98%AF%E7%8E%84%E5%AD%A6%EF%BC%8C%E5%BF%85%E9%A1%BB%E7%9B%AE%E8%A7%86"><span class="toc-number">1.5.4.</span> <span class="toc-text">5.4 排版是玄学，必须目视</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-matplotlib-%E7%9A%84%E4%B8%A4%E4%B8%AA%E5%B0%8F%E5%9D%91"><span class="toc-number">1.5.5.</span> <span class="toc-text">5.5 matplotlib 的两个小坑</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%AE%9E%E6%B5%8B%E6%9A%B4%E9%9C%B2%E7%9A%84%E4%B8%A4%E4%B8%AA%E7%9C%9F-bug"><span class="toc-number">1.6.</span> <span class="toc-text">6.实测暴露的两个真 bug</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%9B%AE%E5%BD%95%E7%BA%AA%E5%BE%8B%EF%BC%9A%E6%8F%90%E4%BA%A4%E5%8C%BA%E5%8F%AA%E8%83%BD%E6%94%BE%E6%9C%80%E7%BB%88%E4%BA%A7%E7%89%A9"><span class="toc-number">1.7.</span> <span class="toc-text">7.目录纪律：提交区只能放最终产物</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E7%BB%93%E8%AF%AD"><span class="toc-number">1.8.</span> <span class="toc-text">8.结语</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E6%8A%8A%E5%A4%A7%E5%AD%A6%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A%E5%81%9A%E6%88%90-Agent-Skill/" title="把大学物理实验报告做成 Agent Skill">把大学物理实验报告做成 Agent Skill</a><time datetime="2026-09-18T12:11:29.000Z" title="Created 2026-09-18 20:11:29">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E6%A0%A1%E5%9B%AD%E7%BD%91-Dr-COM-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%83%A8%E7%BD%B2%E4%B8%8E-11-GB-syslog-%E6%B2%BB%E7%90%86/" title="校园网 Dr.COM 客户端部署与 11 GB syslog 治理">校园网 Dr.COM 客户端部署与 11 GB syslog 治理</a><time datetime="2026-09-18T12:11:26.000Z" title="Created 2026-09-18 20:11:26">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/" title="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</a><time datetime="2026-09-18T12:11:23.000Z" title="Created 2026-09-18 20:11:23">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E8%AE%B02026%E5%B9%B4%E7%94%B5%E8%B5%9BH%E9%A2%98%EF%BC%9A%E8%BD%A6%E8%BD%BD%E5%B9%B3%E8%A1%A1%E6%BB%9A%E7%90%83%E7%B3%BB%E7%BB%9F/" title="记2026年电赛H题：车载平衡滚球系统">记2026年电赛H题：车载平衡滚球系统</a><time datetime="2026-09-18T12:11:22.000Z" title="Created 2026-09-18 20:11:22">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/06/%E5%85%B3%E4%BA%8Exorg%E4%B8%8Bwayland%E5%BF%AB%E6%8D%B7%E6%93%8D%E4%BD%9C%E7%9A%84%E7%AE%80%E5%8D%95%E5%B9%B3%E6%9B%BF/" title="关于xorg下wayland快捷操作的简单平替">关于xorg下wayland快捷操作的简单平替</a><time datetime="2026-08-06T07:13:52.000Z" title="Created 2026-08-06 15:13:52">2026-08-06</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/top_image.jpg);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harekasa</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div><div class="footer_custom_text">我始终如一 ~</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Toggle Between Traditional and Simplified Chinese">繁</button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><script src="/js/TabName.js"></script><script src="/js/tag-colorizer.js"></script><script type="module" src="/js/three-hero.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="80" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
