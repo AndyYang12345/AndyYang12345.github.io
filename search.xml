@@ -37,6 +37,39 @@
     
     
     <entry>
+      <title>给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</title>
+      <link href="/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/"/>
+      <url>/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/</url>
+      
+        <content type="html"><![CDATA[<h1 id="给-DSH-造一份长期记忆：butler-memory-mcp-与-dsh-butler-memory"><a href="#给-DSH-造一份长期记忆：butler-memory-mcp-与-dsh-butler-memory" class="headerlink" title="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory"></a>给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</h1><blockquote><p>文章里出现的命令、token 与密码均为示意值；数据库口令和一次性设备令牌请以自己生成的为准。</p></blockquote><p>DeepSeek Harness（下文简称 DSH）是我最近重度使用的 Agent 框架。它什么都好：插件生态、Web 界面、子代理与工作流——唯独没有”记忆”：关掉会话，它就不记得你是谁。官方仓库里的 <code>examples/mcp-memory</code> 倒是给了三个第三方记忆 MCP 服务器的接入示例，但都只有<strong>模型工具</strong>，没有用户界面——Agent 能记，人却看不见、审不了、撤不回。</p><p>恰好我自己有个 <a href="https://github.com/AndyYang12345/ai-butler-framework">ai-butler-framework</a>（个人管家框架，暂定名），里面已经实现了一套”分层记忆”：敏感度分级、revision 版本历史、审计证据、候选确认，规则相当完整。于是问题很自然地变成：<strong>能不能把它的记忆能力沉淀成 DSH 的插件，让 Agent 能用、用户能看？</strong></p><p>这篇文章记录这条线从零到上架的全过程：两个发布包、十几个真实踩坑、以及最后提交市场收录时差点翻车的 PR。</p><h2 id="1-总体架构：两个包，两条通道"><a href="#1-总体架构：两个包，两条通道" class="headerlink" title="1. 总体架构：两个包，两条通道"></a>1. 总体架构：两个包，两条通道</h2><p>最终交付物是两个可独立安装的包：</p><table><thead><tr><th>包</th><th>注册中心</th><th>职责</th></tr></thead><tbody><tr><td><code>butler-memory-mcp</code></td><td>PyPI</td><td>MCP 服务器：把分层记忆暴露为 9 个标准 MCP 工具</td></tr><tr><td><code>dsh-butler-memory</code></td><td>npm</td><td>DSH 组合包：接线 agent 工具 + 提供 Web 记忆面板</td></tr></tbody></table><p>运行时结构如下：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DSH agent ──mcp__butler__memory_*──► butler-memory-mcp (stdio, DSH 托管)</span><br><span class="line">DSH web 面板 ──host.call──► host 半部 ──JSON-RPC──► butler-memory-mcp (stdio, 插件托管)</span><br><span class="line">                                     │</span><br><span class="line">                              PostgreSQL（记忆事实源）</span><br></pre></td></tr></table></figure><p>两条通道完全独立：agent 侧的 MCP 子进程由 DSH 的 <code>dsh-mcp-client</code> 托管；面板侧由我们插件的 host 半部<strong>自己 spawn 一个 stdio 子进程</strong>，走 JSON-RPC 转发。这意味着用户<strong>不需要手动启动任何服务</strong>——装上插件即可用，桥进程崩溃后下次调用自动拉起。</p><h2 id="2-记忆语义：不只是”存一段文本”"><a href="#2-记忆语义：不只是”存一段文本”" class="headerlink" title="2. 记忆语义：不只是”存一段文本”"></a>2. 记忆语义：不只是”存一段文本”</h2><p>大部分记忆插件只是把对话往向量库里塞。我这套从 butler 框架继承的语义更接近”个人数据治理”：</p><ul><li><strong>敏感度分级</strong>：public → internal → private → secret。模型能写、能读的只有前两级，检索接口天然排除 private&#x2F;secret——隐私封顶是硬约束，不是提示词；</li><li><strong>revision 乐观锁</strong>：每条记忆是 append-only 修订历史。修改&#x2F;归档必须携带 <code>expected_revision</code>，冲突就报错，绝不静默覆盖；</li><li><strong>审计同事务</strong>：每次写入在同一事务里落一条审计记录（谁、哪台设备、什么动作）；</li><li><strong>候选机制</strong>：推断出来的事实先进入”候选”池，等用户显式接受才成为长期记忆——模型永远不能静默入库。</li></ul><p>面板把这些语义可视化：记忆列表带类别&#x2F;敏感度徽章、点击看修订时间线、归档开关、候选的接受&#x2F;拒绝按钮，外加一个服务健康状态条——服务离线时直接给出分步安装指引。</p><h2 id="3-工程上最值得记的几件事"><a href="#3-工程上最值得记的几件事" class="headerlink" title="3. 工程上最值得记的几件事"></a>3. 工程上最值得记的几件事</h2><p>这一路踩的坑比预想的多，挑几个最有普适性的写下来。</p><h3 id="3-1-自包含分发：vendoring"><a href="#3-1-自包含分发：vendoring" class="headerlink" title="3.1 自包含分发：vendoring"></a>3.1 自包含分发：vendoring</h3><p>最初 MCP 包是”薄桥”：运行时 import 框架的 <code>MemoryService</code>。但框架包含 agent runtime 等一堆无关组件，作为中间件发布不合适。最终方案是 <strong>vendoring</strong>——把记忆领域代码（约 3300 行）复制进包内并改写 import，运行时零依赖框架；同时用 <code>VENDORED.md</code> 记录上游文件清单与行号区间，配一个 SHA-256 基线漂移检查脚本。经验是：vendoring 可以接受，但<strong>必须配套漂移治理</strong>，否则两个实现迟早分叉。</p><h3 id="3-2-MCP-协议版本协商"><a href="#3-2-MCP-协议版本协商" class="headerlink" title="3.2 MCP 协议版本协商"></a>3.2 MCP 协议版本协商</h3><p>手写的 MCP stdio 服务器第一次接入 DSH 就失败了：DSH 的 SDK 客户端请求 <code>protocolVersion: 2025-11-25</code>，而我只实现了到 2025-06-18。协议版本要按客户端请求回显，支持列表必须覆盖主流 SDK 的版本——这是手写协议最容易漏的一环。</p><h3 id="3-3-DSH-静态插件的三件套"><a href="#3-3-DSH-静态插件的三件套" class="headerlink" title="3.3 DSH 静态插件的三件套"></a>3.3 DSH 静态插件的三件套</h3><p>给 DSH 写”带 UI 的插件”，有三个非直观的契约：</p><ul><li><strong>RPC 桥</strong>：静态包的 host 半部没有 <code>harness/host.call</code>（那是动态包专属）。正确姿势是 <code>ctx.inject([&#39;connection&#39;])</code> 后在 <code>ctx.connection.rpc.handle(&#39;/频道名&#39;, handler, {authority: &#39;loopback&#39;})</code> 注册逻辑通道，浏览器侧用 <code>ctx.connection.rpc.call</code> 调用；</li><li><strong>bundle 格式</strong>：<code>dsh.client</code> 的浏览器 bundle 不是普通 ESM，必须包装成 <code>window.__ModuleLoader__.load({id, factory: require =&gt; ...})</code> 的 CJS 工厂（React 由页面提供）；</li><li><strong>Slot 注册</strong>：UI 插入点是 <code>ctx.slots.inject(key, () =&gt; ctx.slots.register({name, id, order}, Component))</code>——双参数形式，跟直觉的”注册表 API”写法完全不同。</li></ul><p>这三条都是从官方包源码（<code>dsh-api-gateway</code>、<code>dsh-client-ui-jobs</code>）里逆向出来的，文档里没有明说。</p><h3 id="3-4-双通道参数映射-bug"><a href="#3-4-双通道参数映射-bug" class="headerlink" title="3.4 双通道参数映射 bug"></a>3.4 双通道参数映射 bug</h3><p>面板走 stdio 通道时点击记忆详情报 <code>memory_id must be a valid UUID</code>。查了半天：面板传的是驼峰 <code>memoryId</code>，MCP 工具只认下划线 <code>memory_id</code>；HTTP 通道没事是因为 ID 拼进了 URL 路径。教训：<strong>多通道转发时参数键名对齐要显式映射，别指望两边自动一致</strong>。候选的 accept&#x2F;reject 当时潜伏着同样的 bug，一并修掉了。</p><h3 id="3-5-pnpm-拦截-postinstall"><a href="#3-5-pnpm-拦截-postinstall" class="headerlink" title="3.5 pnpm 拦截 postinstall"></a>3.5 pnpm 拦截 postinstall</h3><p>第一版 npm 包用 <code>postinstall</code> 把 SKILL.md 复制到 DSH 的技能目录，结果 <code>dsh plugin add</code> 直接失败：pnpm 默认拦截依赖包的构建脚本，DSH 把这个拦截当安装失败。解法是把技能安装改成 <strong>host 插件运行时幂等复制</strong>——删掉 postinstall 后安装零授权，技能在插件激活时自动就位。</p><h3 id="3-6-降级哲学：可选功能不能当硬依赖"><a href="#3-6-降级哲学：可选功能不能当硬依赖" class="headerlink" title="3.6 降级哲学：可选功能不能当硬依赖"></a>3.6 降级哲学：可选功能不能当硬依赖</h3><p>开发期为了快速暴露错误，我把 <code>failOnStartupError</code> 设成了 <code>true</code> 并带进了发布版。后果是用户机器上桥一挂（没装 pip 包&#x2F;没配 env&#x2F;数据库不通），<strong>整个 dsh web 启动失败，普通对话都进不去</strong>。发布包必须回到默认 <code>false</code>：桥缺失时只是记忆工具缺席，面板显示离线指引。修完我做了个破坏性验证——把桥从 PATH 里删干净，dsh 照常启动。</p><h3 id="3-7-一键起库"><a href="#3-7-一键起库" class="headerlink" title="3.7 一键起库"></a>3.7 一键起库</h3><p>为了让新用户（比如双系统 Windows 端）少折腾，最后加了一个 <code>setup-docker</code> 子命令：探测 docker → 建容器 → 等健康 → 写配置 → 建 schema → 建身份，一条命令完成。原则是<strong>显式执行而非隐式自动</strong>：Docker 是特权操作，插件静默替你 <code>docker run</code> 属于供应链红线，但用户主动敲的命令里做多少编排都合理。</p><h2 id="4-发布与市场收录"><a href="#4-发布与市场收录" class="headerlink" title="4. 发布与市场收录"></a>4. 发布与市场收录</h2><p>发布线本身也是踩坑现场：</p><ul><li><strong>PyPI</strong>：token 用 <code>__token__</code> 哨兵用户名；多项目时每个项目一个单项目 token，存项目内 <code>.pypi</code>（gitignore），绝不共享全局 <code>~/.pypirc</code>——我就在全局配置的旧凭据上吃过 403；</li><li><strong>npm</strong>：token 放项目 <code>.npmrc</code>；发布后不可覆盖同版本，每次修复都要 bump；</li><li><strong>市场收录</strong>（<a href="https://github.com/awesome-dsh-plugin/awesome-dsh-plugin">awesome-dsh-plugin</a>）：硬门槛是”仓库满 1 天 + 提交数 ≥ 10 + <code>dsh.bundle</code> 声明”，提交物是一个 YAML + 重新生成的双语 README。我犯了个经典错误：<strong>PR 提给了自己 fork 的仓库而不是官方仓库</strong>，导致 diff 混进上游几百个提交、AI 审查误报满天飞。重建分支为单提交后重提，CI 一次全绿。</li></ul><p>目前状态：两个包均已发布（PyPI <code>butler-memory-mcp</code>、npm <code>dsh-butler-memory</code>），市场 PR 已过自动检查等待合并。</p><h2 id="5-结语与后续"><a href="#5-结语与后续" class="headerlink" title="5. 结语与后续"></a>5. 结语与后续</h2><p>这条线最有价值的收获不是功能本身，而是一套可以复用的方法论：<strong>vendoring 加漂移治理、双通道参数对齐、可选功能的降级边界、显式执行 vs 隐式自动的权限边界</strong>。后续计划三件事：给市场详情页补面板截图、按框架 ADR 的做法做一次”本地哈希检索 vs 真实 embedding”的召回评测（决定要不要引入 pgvector）、以及等框架整体验收后再决定是否公开上游。</p><p>项目地址：<a href="https://github.com/AndyYang12345/butler-memory-mcp">butler-memory-mcp</a> · <a href="https://github.com/AndyYang12345/dsh-butler-memory">dsh-butler-memory</a> · <a href="https://pypi.org/project/butler-memory-mcp">PyPI</a> · <a href="https://www.npmjs.com/package/dsh-butler-memory">npm</a></p><blockquote><ul><li>实际作者：<strong>DeepSeekV41Flash</strong>（本文由 AI 生成）</li><li>参与编辑：<strong>Harekasa</strong>（人工审核校对）</li></ul></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> AI工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> DSH </tag>
+            
+            <tag> MCP </tag>
+            
+            <tag> 长期记忆 </tag>
+            
+            <tag> PostgreSQL </tag>
+            
+            <tag> 插件开发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>记2026年电赛H题：车载平衡滚球系统</title>
       <link href="/2026/09/18/%E8%AE%B02026%E5%B9%B4%E7%94%B5%E8%B5%9BH%E9%A2%98%EF%BC%9A%E8%BD%A6%E8%BD%BD%E5%B9%B3%E8%A1%A1%E6%BB%9A%E7%90%83%E7%B3%BB%E7%BB%9F/"/>
       <url>/2026/09/18/%E8%AE%B02026%E5%B9%B4%E7%94%B5%E8%B5%9BH%E9%A2%98%EF%BC%9A%E8%BD%A6%E8%BD%BD%E5%B9%B3%E8%A1%A1%E6%BB%9A%E7%90%83%E7%B3%BB%E7%BB%9F/</url>
@@ -157,11 +190,11 @@
       
         <tags>
             
-            <tag> VSCode </tag>
-            
             <tag> MSPM0 </tag>
             
             <tag> 嵌入式 </tag>
+            
+            <tag> VSCode </tag>
             
             <tag> CMake </tag>
             
@@ -221,11 +254,11 @@
       
         <tags>
             
+            <tag> VSCode </tag>
+            
             <tag> 嵌入式开发 </tag>
             
             <tag> STM32 </tag>
-            
-            <tag> VSCode </tag>
             
             <tag> DapLink </tag>
             
@@ -265,11 +298,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/TabName.js"/>
-      <url>/js/TabName.js</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[// TabName(function() {    'use strict';    // ========== 配置区域（按需修改）==========    const config = {        // 用户离开时显示的标题（随机显示）        leaveMessages: [            '这里万籁俱寂……太安静了。别留下我。'        ],        // 用户回来时显示的标题（可选，留空则恢复原标题）        returnMessage: '我知道我们会再次相见',        // 检查频率（毫秒），建议不要改太小        checkInterval: 200,        // 是否启用控制台输出（调试用）        debug: false    };    // ========== 配置结束 ==========    let originalTitle = document.title;    let timer = null;    let isAway = false;    function log(msg) {        if (config.debug) console.log('[FunnyTitle]', msg);    }    function setTitle(title) {        document.title = title;        log('标题已更改为: ' + title);    }    // 获取随机离开信息    function getRandomLeaveMessage() {        if (!config.leaveMessages.length) return '🔙 快回来吧~';        const randomIndex = Math.floor(Math.random() * config.leaveMessages.length);        return config.leaveMessages[randomIndex];    }    // 页面可见性变化处理    function handleVisibilityChange() {        if (document.hidden) {            // 用户离开页面            if (!isAway) {                isAway = true;                const leaveMsg = getRandomLeaveMessage();                setTitle(leaveMsg);                log('检测到用户离开页面');            }        } else {            // 用户回来            if (isAway) {                isAway = false;                const newTitle = config.returnMessage ? config.returnMessage : originalTitle;                setTitle(newTitle);                log('检测到用户回来');                // 延时恢复原标题（optional）                if (config.returnMessage) {                    setTimeout(() => {                        if (!document.hidden) {                            setTitle(originalTitle);                        }                    }, 1500);                }            }        }    }    // 获取原始标题（防止后续被修改）    function getOriginalTitle() {        return document.title;    }    // 主动检查焦点（兼容性增强）    function checkFocus() {        if (!document.hasFocus && !document.hidden) return;        if (document.hasFocus && document.hasFocus()) {            if (isAway) {                isAway = false;                setTitle(originalTitle);                log('通过焦点检测到用户回来');            }        }    }    // 初始化    function init() {        originalTitle = getOriginalTitle();        log('初始化完成，原始标题：' + originalTitle);        // 监听页面可见性变化（现代浏览器标准方式）        document.addEventListener('visibilitychange', handleVisibilityChange);        // 备用：监听窗口焦点        window.addEventListener('focus', function() {            if (isAway && !document.hidden) {                isAway = false;                setTitle(originalTitle);                log('通过窗口焦点检测到用户回来');            }        });        window.addEventListener('blur', function() {            if (!isAway && document.hidden === undefined) {                // 对于不支持 visibility API 的老旧浏览器                isAway = true;                setTitle(getRandomLeaveMessage());                log('窗口失去焦点');            }        });        // 定期检查（可选，增加可靠性）        if (config.checkInterval > 0) {            setInterval(checkFocus, config.checkInterval);        }    }    // 如果页面已加载完成则立即执行，否则等待    if (document.readyState === 'loading') {        document.addEventListener('DOMContentLoaded', init);    } else {        init();    }})();]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -281,6 +314,17 @@
       <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/TabName.js"/>
+      <url>/js/TabName.js</url>
+      
+        <content type="html"><![CDATA[// TabName(function() {    'use strict';    // ========== 配置区域（按需修改）==========    const config = {        // 用户离开时显示的标题（随机显示）        leaveMessages: [            '这里万籁俱寂……太安静了。别留下我。'        ],        // 用户回来时显示的标题（可选，留空则恢复原标题）        returnMessage: '我知道我们会再次相见',        // 检查频率（毫秒），建议不要改太小        checkInterval: 200,        // 是否启用控制台输出（调试用）        debug: false    };    // ========== 配置结束 ==========    let originalTitle = document.title;    let timer = null;    let isAway = false;    function log(msg) {        if (config.debug) console.log('[FunnyTitle]', msg);    }    function setTitle(title) {        document.title = title;        log('标题已更改为: ' + title);    }    // 获取随机离开信息    function getRandomLeaveMessage() {        if (!config.leaveMessages.length) return '🔙 快回来吧~';        const randomIndex = Math.floor(Math.random() * config.leaveMessages.length);        return config.leaveMessages[randomIndex];    }    // 页面可见性变化处理    function handleVisibilityChange() {        if (document.hidden) {            // 用户离开页面            if (!isAway) {                isAway = true;                const leaveMsg = getRandomLeaveMessage();                setTitle(leaveMsg);                log('检测到用户离开页面');            }        } else {            // 用户回来            if (isAway) {                isAway = false;                const newTitle = config.returnMessage ? config.returnMessage : originalTitle;                setTitle(newTitle);                log('检测到用户回来');                // 延时恢复原标题（optional）                if (config.returnMessage) {                    setTimeout(() => {                        if (!document.hidden) {                            setTitle(originalTitle);                        }                    }, 1500);                }            }        }    }    // 获取原始标题（防止后续被修改）    function getOriginalTitle() {        return document.title;    }    // 主动检查焦点（兼容性增强）    function checkFocus() {        if (!document.hasFocus && !document.hidden) return;        if (document.hasFocus && document.hasFocus()) {            if (isAway) {                isAway = false;                setTitle(originalTitle);                log('通过焦点检测到用户回来');            }        }    }    // 初始化    function init() {        originalTitle = getOriginalTitle();        log('初始化完成，原始标题：' + originalTitle);        // 监听页面可见性变化（现代浏览器标准方式）        document.addEventListener('visibilitychange', handleVisibilityChange);        // 备用：监听窗口焦点        window.addEventListener('focus', function() {            if (isAway && !document.hidden) {                isAway = false;                setTitle(originalTitle);                log('通过窗口焦点检测到用户回来');            }        });        window.addEventListener('blur', function() {            if (!isAway && document.hidden === undefined) {                // 对于不支持 visibility API 的老旧浏览器                isAway = true;                setTitle(getRandomLeaveMessage());                log('窗口失去焦点');            }        });        // 定期检查（可选，增加可靠性）        if (config.checkInterval > 0) {            setInterval(checkFocus, config.checkInterval);        }    }    // 如果页面已加载完成则立即执行，否则等待    if (document.readyState === 'loading') {        document.addEventListener('DOMContentLoaded', init);    } else {        init();    }})();]]></content>
       
     </entry>
     
@@ -310,17 +354,6 @@
     
     <entry>
       <title></title>
-      <link href="/models/README.html"/>
-      <url>/models/README.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="3D-Models"><a href="#3D-Models" class="headerlink" title="3D Models"></a>3D Models</h1><p>将你的 glTF&#x2F;GLB 3D 模型文件放入此目录。</p><p>推荐格式：<strong>.glb</strong> (glTF Binary)，单文件便于管理。</p><p>模型将用于首页 Hero 区域的 Three.js 3D 角色展示动画。<br>默认加载路径：<code>/models/character.glb</code></p><h2 id="模型要求"><a href="#模型要求" class="headerlink" title="模型要求"></a>模型要求</h2><ul><li>三角面数：建议 &lt; 50k（保证移动端性能）</li><li>材质：PBR 贴图（baseColor、normal、metallicRoughness）</li><li>尺寸：模型高度约 2-3 单位</li><li>格式：glTF 2.0（.glb 或 .gltf + 外部资源）</li></ul>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
       <link href="/js/three-hero.js"/>
       <url>/js/three-hero.js</url>
       
@@ -331,20 +364,20 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title></title>
+      <link href="/models/README.html"/>
+      <url>/models/README.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h1 id="3D-Models"><a href="#3D-Models" class="headerlink" title="3D Models"></a>3D Models</h1><p>将你的 glTF&#x2F;GLB 3D 模型文件放入此目录。</p><p>推荐格式：<strong>.glb</strong> (glTF Binary)，单文件便于管理。</p><p>模型将用于首页 Hero 区域的 Three.js 3D 角色展示动画。<br>默认加载路径：<code>/models/character.glb</code></p><h2 id="模型要求"><a href="#模型要求" class="headerlink" title="模型要求"></a>模型要求</h2><ul><li>三角面数：建议 &lt; 50k（保证移动端性能）</li><li>材质：PBR 贴图（baseColor、normal、metallicRoughness）</li><li>尺寸：模型高度约 2-3 单位</li><li>格式：glTF 2.0（.glb 或 .gltf + 外部资源）</li></ul>]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>电影</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -364,9 +397,9 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movies/index.html"/>
-      <url>/movies/index.html</url>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       

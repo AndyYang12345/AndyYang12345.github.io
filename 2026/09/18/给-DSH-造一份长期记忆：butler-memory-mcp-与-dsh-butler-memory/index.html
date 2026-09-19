@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory | Ciallo(∠・ω&lt; )⌒☆</title><meta name="author" content="Harekasa"><meta name="copyright" content="Harekasa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F5F0FF"><meta name="description" content="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory 文章里出现的命令、token 与密码均为示意值；数据库口令和一次性设备令牌请以自己生成的为准。  DeepSeek Harness（下文简称 DSH）是我最近重度使用的 Agent 框架。它什么都好：插件生态、Web 界面、子代理与工作流——唯独没有”记忆”：关掉会话，它就不记得你是谁。官方仓库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory">
+<meta property="og:url" content="https://andyyang12345.github.io/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/index.html">
+<meta property="og:site_name" content="Ciallo(∠・ω&lt; )⌒☆">
+<meta property="og:description" content="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory 文章里出现的命令、token 与密码均为示意值；数据库口令和一次性设备令牌请以自己生成的为准。  DeepSeek Harness（下文简称 DSH）是我最近重度使用的 Agent 框架。它什么都好：插件生态、Web 界面、子代理与工作流——唯独没有”记忆”：关掉会话，它就不记得你是谁。官方仓库">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://andyyang12345.github.io/img/github-profile.png">
+<meta property="article:published_time" content="2026-09-18T12:11:23.000Z">
+<meta property="article:modified_time" content="2026-09-19T03:39:52.699Z">
+<meta property="article:author" content="Harekasa">
+<meta property="article:tag" content="DSH">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="PostgreSQL">
+<meta property="article:tag" content="插件开发">
+<meta property="article:tag" content="长期记忆">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://andyyang12345.github.io/img/github-profile.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory",
+  "url": "https://andyyang12345.github.io/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/",
+  "image": "https://andyyang12345.github.io/img/github-profile.png",
+  "datePublished": "2026-09-18T12:11:23.000Z",
+  "dateModified": "2026-09-19T03:39:52.699Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harekasa",
+      "url": "https://github.com/AndyYang12345"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/prts-512x512.png"><link rel="canonical" href="https://andyyang12345.github.io/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A2438')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F5F0FF')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top_image.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Ciallo(∠・ω&lt; )⌒☆</span></a><a class="nav-page-title" href="/"><span class="site-name">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-09-18T12:11:23.000Z" title="Created 2026-09-18 20:11:23">2026-09-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-09-19T03:39:52.699Z" title="Updated 2026-09-19 11:39:52">2026-09-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI%E5%B7%A5%E5%85%B7/">AI工具</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>7mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="给-DSH-造一份长期记忆：butler-memory-mcp-与-dsh-butler-memory"><a href="#给-DSH-造一份长期记忆：butler-memory-mcp-与-dsh-butler-memory" class="headerlink" title="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory"></a>给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</h1><blockquote>
+<p>文章里出现的命令、token 与密码均为示意值；数据库口令和一次性设备令牌请以自己生成的为准。</p>
+</blockquote>
+<p>DeepSeek Harness（下文简称 DSH）是我最近重度使用的 Agent 框架。它什么都好：插件生态、Web 界面、子代理与工作流——唯独没有”记忆”：关掉会话，它就不记得你是谁。官方仓库里的 <code>examples/mcp-memory</code> 倒是给了三个第三方记忆 MCP 服务器的接入示例，但都只有<strong>模型工具</strong>，没有用户界面——Agent 能记，人却看不见、审不了、撤不回。</p>
+<p>恰好我自己有个 <a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/ai-butler-framework">ai-butler-framework</a>（个人管家框架，暂定名），里面已经实现了一套”分层记忆”：敏感度分级、revision 版本历史、审计证据、候选确认，规则相当完整。于是问题很自然地变成：<strong>能不能把它的记忆能力沉淀成 DSH 的插件，让 Agent 能用、用户能看？</strong></p>
+<p>这篇文章记录这条线从零到上架的全过程：两个发布包、十几个真实踩坑、以及最后提交市场收录时差点翻车的 PR。</p>
+<h2 id="1-总体架构：两个包，两条通道"><a href="#1-总体架构：两个包，两条通道" class="headerlink" title="1. 总体架构：两个包，两条通道"></a>1. 总体架构：两个包，两条通道</h2><p>最终交付物是两个可独立安装的包：</p>
+<table>
+<thead>
+<tr>
+<th>包</th>
+<th>注册中心</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>butler-memory-mcp</code></td>
+<td>PyPI</td>
+<td>MCP 服务器：把分层记忆暴露为 9 个标准 MCP 工具</td>
+</tr>
+<tr>
+<td><code>dsh-butler-memory</code></td>
+<td>npm</td>
+<td>DSH 组合包：接线 agent 工具 + 提供 Web 记忆面板</td>
+</tr>
+</tbody></table>
+<p>运行时结构如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DSH agent ──mcp__butler__memory_*──► butler-memory-mcp (stdio, DSH 托管)</span><br><span class="line">DSH web 面板 ──host.call──► host 半部 ──JSON-RPC──► butler-memory-mcp (stdio, 插件托管)</span><br><span class="line">                                     │</span><br><span class="line">                              PostgreSQL（记忆事实源）</span><br></pre></td></tr></table></figure>
+
+<p>两条通道完全独立：agent 侧的 MCP 子进程由 DSH 的 <code>dsh-mcp-client</code> 托管；面板侧由我们插件的 host 半部<strong>自己 spawn 一个 stdio 子进程</strong>，走 JSON-RPC 转发。这意味着用户<strong>不需要手动启动任何服务</strong>——装上插件即可用，桥进程崩溃后下次调用自动拉起。</p>
+<h2 id="2-记忆语义：不只是”存一段文本”"><a href="#2-记忆语义：不只是”存一段文本”" class="headerlink" title="2. 记忆语义：不只是”存一段文本”"></a>2. 记忆语义：不只是”存一段文本”</h2><p>大部分记忆插件只是把对话往向量库里塞。我这套从 butler 框架继承的语义更接近”个人数据治理”：</p>
+<ul>
+<li><strong>敏感度分级</strong>：public → internal → private → secret。模型能写、能读的只有前两级，检索接口天然排除 private&#x2F;secret——隐私封顶是硬约束，不是提示词；</li>
+<li><strong>revision 乐观锁</strong>：每条记忆是 append-only 修订历史。修改&#x2F;归档必须携带 <code>expected_revision</code>，冲突就报错，绝不静默覆盖；</li>
+<li><strong>审计同事务</strong>：每次写入在同一事务里落一条审计记录（谁、哪台设备、什么动作）；</li>
+<li><strong>候选机制</strong>：推断出来的事实先进入”候选”池，等用户显式接受才成为长期记忆——模型永远不能静默入库。</li>
+</ul>
+<p>面板把这些语义可视化：记忆列表带类别&#x2F;敏感度徽章、点击看修订时间线、归档开关、候选的接受&#x2F;拒绝按钮，外加一个服务健康状态条——服务离线时直接给出分步安装指引。</p>
+<h2 id="3-工程上最值得记的几件事"><a href="#3-工程上最值得记的几件事" class="headerlink" title="3. 工程上最值得记的几件事"></a>3. 工程上最值得记的几件事</h2><p>这一路踩的坑比预想的多，挑几个最有普适性的写下来。</p>
+<h3 id="3-1-自包含分发：vendoring"><a href="#3-1-自包含分发：vendoring" class="headerlink" title="3.1 自包含分发：vendoring"></a>3.1 自包含分发：vendoring</h3><p>最初 MCP 包是”薄桥”：运行时 import 框架的 <code>MemoryService</code>。但框架包含 agent runtime 等一堆无关组件，作为中间件发布不合适。最终方案是 <strong>vendoring</strong>——把记忆领域代码（约 3300 行）复制进包内并改写 import，运行时零依赖框架；同时用 <code>VENDORED.md</code> 记录上游文件清单与行号区间，配一个 SHA-256 基线漂移检查脚本。经验是：vendoring 可以接受，但<strong>必须配套漂移治理</strong>，否则两个实现迟早分叉。</p>
+<h3 id="3-2-MCP-协议版本协商"><a href="#3-2-MCP-协议版本协商" class="headerlink" title="3.2 MCP 协议版本协商"></a>3.2 MCP 协议版本协商</h3><p>手写的 MCP stdio 服务器第一次接入 DSH 就失败了：DSH 的 SDK 客户端请求 <code>protocolVersion: 2025-11-25</code>，而我只实现了到 2025-06-18。协议版本要按客户端请求回显，支持列表必须覆盖主流 SDK 的版本——这是手写协议最容易漏的一环。</p>
+<h3 id="3-3-DSH-静态插件的三件套"><a href="#3-3-DSH-静态插件的三件套" class="headerlink" title="3.3 DSH 静态插件的三件套"></a>3.3 DSH 静态插件的三件套</h3><p>给 DSH 写”带 UI 的插件”，有三个非直观的契约：</p>
+<ul>
+<li><strong>RPC 桥</strong>：静态包的 host 半部没有 <code>harness/host.call</code>（那是动态包专属）。正确姿势是 <code>ctx.inject([&#39;connection&#39;])</code> 后在 <code>ctx.connection.rpc.handle(&#39;/频道名&#39;, handler, {authority: &#39;loopback&#39;})</code> 注册逻辑通道，浏览器侧用 <code>ctx.connection.rpc.call</code> 调用；</li>
+<li><strong>bundle 格式</strong>：<code>dsh.client</code> 的浏览器 bundle 不是普通 ESM，必须包装成 <code>window.__ModuleLoader__.load({id, factory: require =&gt; ...})</code> 的 CJS 工厂（React 由页面提供）；</li>
+<li><strong>Slot 注册</strong>：UI 插入点是 <code>ctx.slots.inject(key, () =&gt; ctx.slots.register({name, id, order}, Component))</code>——双参数形式，跟直觉的”注册表 API”写法完全不同。</li>
+</ul>
+<p>这三条都是从官方包源码（<code>dsh-api-gateway</code>、<code>dsh-client-ui-jobs</code>）里逆向出来的，文档里没有明说。</p>
+<h3 id="3-4-双通道参数映射-bug"><a href="#3-4-双通道参数映射-bug" class="headerlink" title="3.4 双通道参数映射 bug"></a>3.4 双通道参数映射 bug</h3><p>面板走 stdio 通道时点击记忆详情报 <code>memory_id must be a valid UUID</code>。查了半天：面板传的是驼峰 <code>memoryId</code>，MCP 工具只认下划线 <code>memory_id</code>；HTTP 通道没事是因为 ID 拼进了 URL 路径。教训：<strong>多通道转发时参数键名对齐要显式映射，别指望两边自动一致</strong>。候选的 accept&#x2F;reject 当时潜伏着同样的 bug，一并修掉了。</p>
+<h3 id="3-5-pnpm-拦截-postinstall"><a href="#3-5-pnpm-拦截-postinstall" class="headerlink" title="3.5 pnpm 拦截 postinstall"></a>3.5 pnpm 拦截 postinstall</h3><p>第一版 npm 包用 <code>postinstall</code> 把 SKILL.md 复制到 DSH 的技能目录，结果 <code>dsh plugin add</code> 直接失败：pnpm 默认拦截依赖包的构建脚本，DSH 把这个拦截当安装失败。解法是把技能安装改成 <strong>host 插件运行时幂等复制</strong>——删掉 postinstall 后安装零授权，技能在插件激活时自动就位。</p>
+<h3 id="3-6-降级哲学：可选功能不能当硬依赖"><a href="#3-6-降级哲学：可选功能不能当硬依赖" class="headerlink" title="3.6 降级哲学：可选功能不能当硬依赖"></a>3.6 降级哲学：可选功能不能当硬依赖</h3><p>开发期为了快速暴露错误，我把 <code>failOnStartupError</code> 设成了 <code>true</code> 并带进了发布版。后果是用户机器上桥一挂（没装 pip 包&#x2F;没配 env&#x2F;数据库不通），<strong>整个 dsh web 启动失败，普通对话都进不去</strong>。发布包必须回到默认 <code>false</code>：桥缺失时只是记忆工具缺席，面板显示离线指引。修完我做了个破坏性验证——把桥从 PATH 里删干净，dsh 照常启动。</p>
+<h3 id="3-7-一键起库"><a href="#3-7-一键起库" class="headerlink" title="3.7 一键起库"></a>3.7 一键起库</h3><p>为了让新用户（比如双系统 Windows 端）少折腾，最后加了一个 <code>setup-docker</code> 子命令：探测 docker → 建容器 → 等健康 → 写配置 → 建 schema → 建身份，一条命令完成。原则是<strong>显式执行而非隐式自动</strong>：Docker 是特权操作，插件静默替你 <code>docker run</code> 属于供应链红线，但用户主动敲的命令里做多少编排都合理。</p>
+<h2 id="4-发布与市场收录"><a href="#4-发布与市场收录" class="headerlink" title="4. 发布与市场收录"></a>4. 发布与市场收录</h2><p>发布线本身也是踩坑现场：</p>
+<ul>
+<li><strong>PyPI</strong>：token 用 <code>__token__</code> 哨兵用户名；多项目时每个项目一个单项目 token，存项目内 <code>.pypi</code>（gitignore），绝不共享全局 <code>~/.pypirc</code>——我就在全局配置的旧凭据上吃过 403；</li>
+<li><strong>npm</strong>：token 放项目 <code>.npmrc</code>；发布后不可覆盖同版本，每次修复都要 bump；</li>
+<li><strong>市场收录</strong>（<a target="_blank" rel="noopener" href="https://github.com/awesome-dsh-plugin/awesome-dsh-plugin">awesome-dsh-plugin</a>）：硬门槛是”仓库满 1 天 + 提交数 ≥ 10 + <code>dsh.bundle</code> 声明”，提交物是一个 YAML + 重新生成的双语 README。我犯了个经典错误：<strong>PR 提给了自己 fork 的仓库而不是官方仓库</strong>，导致 diff 混进上游几百个提交、AI 审查误报满天飞。重建分支为单提交后重提，CI 一次全绿。</li>
+</ul>
+<p>目前状态：两个包均已发布（PyPI <code>butler-memory-mcp</code>、npm <code>dsh-butler-memory</code>），市场 PR 已过自动检查等待合并。</p>
+<h2 id="5-结语与后续"><a href="#5-结语与后续" class="headerlink" title="5. 结语与后续"></a>5. 结语与后续</h2><p>这条线最有价值的收获不是功能本身，而是一套可以复用的方法论：<strong>vendoring 加漂移治理、双通道参数对齐、可选功能的降级边界、显式执行 vs 隐式自动的权限边界</strong>。后续计划三件事：给市场详情页补面板截图、按框架 ADR 的做法做一次”本地哈希检索 vs 真实 embedding”的召回评测（决定要不要引入 pgvector）、以及等框架整体验收后再决定是否公开上游。</p>
+<p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/butler-memory-mcp">butler-memory-mcp</a> · <a target="_blank" rel="noopener" href="https://github.com/AndyYang12345/dsh-butler-memory">dsh-butler-memory</a> · <a target="_blank" rel="noopener" href="https://pypi.org/project/butler-memory-mcp">PyPI</a> · <a target="_blank" rel="noopener" href="https://www.npmjs.com/package/dsh-butler-memory">npm</a></p>
+<blockquote>
+<ul>
+<li>实际作者：<strong>DeepSeekV41Flash</strong>（本文由 AI 生成）</li>
+<li>参与编辑：<strong>Harekasa</strong>（人工审核校对）</li>
+</ul>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://github.com/AndyYang12345">Harekasa</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://andyyang12345.github.io/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/">https://andyyang12345.github.io/2026/09/18/给-DSH-造一份长期记忆：butler-memory-mcp-与-dsh-butler-memory/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSH/">DSH</a><a class="post-meta__tags" href="/tags/MCP/">MCP</a><a class="post-meta__tags" href="/tags/%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86/">长期记忆</a><a class="post-meta__tags" href="/tags/PostgreSQL/">PostgreSQL</a><a class="post-meta__tags" href="/tags/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/">插件开发</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/09/18/%E6%A0%A1%E5%9B%AD%E7%BD%91-Dr-COM-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%83%A8%E7%BD%B2%E4%B8%8E-11-GB-syslog-%E6%B2%BB%E7%90%86/" title="校园网 Dr.COM 客户端部署与 11 GB syslog 治理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">校园网 Dr.COM 客户端部署与 11 GB syslog 治理</div></div><div class="info-2"><div class="info-item-1">校园网 Dr.COM 客户端部署与 11 GB syslog 治理 文中账号、密码、MAC 均以占位符代替，静态地址为示意值；请以自己登记到的信息为准。  1.问题提出学校学生宿舍的有线网使用基于 Dr.COM 的认证。Windows 下只要装上那个蓝绿色的官方客户端（Drcom）就能登录，但这套客户端只有 Windows 版，Linux 上没有对应程序。于是出现了一个很具体的困境：网络登记照做、静态地址照填，可就是在 Linux 里连不上。 我按学校流程做了三件事：在线上登记房间端口号（每个网口对应一个专属号）、绑定自己的校园网账号、填写电脑的 MAC 地址，随后拿到了一组静态 IPv4 地址和学校 DNS。在 Windows 上把这套地址配好、再打开 Dr.COM 客户端，认证就能通过。问题在于，我日常的开发环境是 Ubuntu，不可能为了一次认证单独留在 Windows 里。 后来在学长的社团论坛帖里看到，他们维护着一个开源项目 scutclient，专门在 Linux 上复刻这套认证流程。这篇文章记录的就是从发现它，到把它跑通、做成开机自启服务，最后治理它带来的日志问题的...</div></div></div></a><a class="pagination-related" href="/2026/09/18/%E8%AE%B02026%E5%B9%B4%E7%94%B5%E8%B5%9BH%E9%A2%98%EF%BC%9A%E8%BD%A6%E8%BD%BD%E5%B9%B3%E8%A1%A1%E6%BB%9A%E7%90%83%E7%B3%BB%E7%BB%9F/" title="记2026年电赛H题：车载平衡滚球系统"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">记2026年电赛H题：车载平衡滚球系统</div></div><div class="info-2"><div class="info-item-1">前言终于打到2026年的电赛了！！最开始是高中毕业的那个暑假了解到这个比赛，然后就一直很像参加，自己也是购入了stm32的套件啊、视觉模块之类的，自己提升嵌入式和视觉水平。后来陆陆续续参加了学校和企业的各种小电赛，锻炼了自己的水平，也积累了不少经验。终于，在大一的暑假，我能够带领自己的小队参加今年的省赛了。但是很可惜的是，今年电赛或许是我参加的唯一一次电赛了，自己也不一定有时间参加后面的电赛，因为明年一年都要搞机甲大师，所以遗憾错过明年的国赛。 话是这么说，今年还是很认真地完成了比赛，也算是对一年前的自己的一个交代，我和我的小队拿下了省级二等奖的成绩。我很清楚地明白究竟在哪里做的不够好，下面就对这次比赛进行一个总结。   赛前准备比赛前针对给出的物料清单，我们逐一进行了采购，最重要的部分还得是之前没有出现过的钢珠和水管。从水管和钢珠的尺寸来看，无疑是要将小球和水管进行某种组合，有一定可能需要结合材料中的线圈等。当时我及其怀疑是电磁炮或者使用电磁效应来感知小球位置的某种机构，所以预先缠了几个小线圈。当然，考虑到比赛多半会涉及到视觉，纯粹的电磁感应不一定靠谱，也有可能是磁铁小车，通过...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harekasa</div><div class="author-info-description">Harekasa的个人博客，分享技术、生活和兴趣爱好。</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/andyyang12345"><i class="fab fa-github"></i><span>OMG its me  !</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/AndyYang12345" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:eeysy_harekasa@mail.scut.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory"><span class="toc-number">1.</span> <span class="toc-text">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84%EF%BC%9A%E4%B8%A4%E4%B8%AA%E5%8C%85%EF%BC%8C%E4%B8%A4%E6%9D%A1%E9%80%9A%E9%81%93"><span class="toc-number">1.1.</span> <span class="toc-text">1. 总体架构：两个包，两条通道</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%AE%B0%E5%BF%86%E8%AF%AD%E4%B9%89%EF%BC%9A%E4%B8%8D%E5%8F%AA%E6%98%AF%E2%80%9D%E5%AD%98%E4%B8%80%E6%AE%B5%E6%96%87%E6%9C%AC%E2%80%9D"><span class="toc-number">1.2.</span> <span class="toc-text">2. 记忆语义：不只是”存一段文本”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%B7%A5%E7%A8%8B%E4%B8%8A%E6%9C%80%E5%80%BC%E5%BE%97%E8%AE%B0%E7%9A%84%E5%87%A0%E4%BB%B6%E4%BA%8B"><span class="toc-number">1.3.</span> <span class="toc-text">3. 工程上最值得记的几件事</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E8%87%AA%E5%8C%85%E5%90%AB%E5%88%86%E5%8F%91%EF%BC%9Avendoring"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1 自包含分发：vendoring</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-MCP-%E5%8D%8F%E8%AE%AE%E7%89%88%E6%9C%AC%E5%8D%8F%E5%95%86"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2 MCP 协议版本协商</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-DSH-%E9%9D%99%E6%80%81%E6%8F%92%E4%BB%B6%E7%9A%84%E4%B8%89%E4%BB%B6%E5%A5%97"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3 DSH 静态插件的三件套</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E5%8F%8C%E9%80%9A%E9%81%93%E5%8F%82%E6%95%B0%E6%98%A0%E5%B0%84-bug"><span class="toc-number">1.3.4.</span> <span class="toc-text">3.4 双通道参数映射 bug</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-pnpm-%E6%8B%A6%E6%88%AA-postinstall"><span class="toc-number">1.3.5.</span> <span class="toc-text">3.5 pnpm 拦截 postinstall</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-%E9%99%8D%E7%BA%A7%E5%93%B2%E5%AD%A6%EF%BC%9A%E5%8F%AF%E9%80%89%E5%8A%9F%E8%83%BD%E4%B8%8D%E8%83%BD%E5%BD%93%E7%A1%AC%E4%BE%9D%E8%B5%96"><span class="toc-number">1.3.6.</span> <span class="toc-text">3.6 降级哲学：可选功能不能当硬依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-%E4%B8%80%E9%94%AE%E8%B5%B7%E5%BA%93"><span class="toc-number">1.3.7.</span> <span class="toc-text">3.7 一键起库</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%8F%91%E5%B8%83%E4%B8%8E%E5%B8%82%E5%9C%BA%E6%94%B6%E5%BD%95"><span class="toc-number">1.4.</span> <span class="toc-text">4. 发布与市场收录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BB%93%E8%AF%AD%E4%B8%8E%E5%90%8E%E7%BB%AD"><span class="toc-number">1.5.</span> <span class="toc-text">5. 结语与后续</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E6%A0%A1%E5%9B%AD%E7%BD%91-Dr-COM-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%83%A8%E7%BD%B2%E4%B8%8E-11-GB-syslog-%E6%B2%BB%E7%90%86/" title="校园网 Dr.COM 客户端部署与 11 GB syslog 治理">校园网 Dr.COM 客户端部署与 11 GB syslog 治理</a><time datetime="2026-09-18T12:11:26.000Z" title="Created 2026-09-18 20:11:26">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E7%BB%99-DSH-%E9%80%A0%E4%B8%80%E4%BB%BD%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%9Abutler-memory-mcp-%E4%B8%8E-dsh-butler-memory/" title="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</a><time datetime="2026-09-18T12:11:23.000Z" title="Created 2026-09-18 20:11:23">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/18/%E8%AE%B02026%E5%B9%B4%E7%94%B5%E8%B5%9BH%E9%A2%98%EF%BC%9A%E8%BD%A6%E8%BD%BD%E5%B9%B3%E8%A1%A1%E6%BB%9A%E7%90%83%E7%B3%BB%E7%BB%9F/" title="记2026年电赛H题：车载平衡滚球系统">记2026年电赛H题：车载平衡滚球系统</a><time datetime="2026-09-18T12:11:22.000Z" title="Created 2026-09-18 20:11:22">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/06/%E5%85%B3%E4%BA%8Exorg%E4%B8%8Bwayland%E5%BF%AB%E6%8D%B7%E6%93%8D%E4%BD%9C%E7%9A%84%E7%AE%80%E5%8D%95%E5%B9%B3%E6%9B%BF/" title="关于xorg下wayland快捷操作的简单平替">关于xorg下wayland快捷操作的简单平替</a><time datetime="2026-08-06T07:13:52.000Z" title="Created 2026-08-06 15:13:52">2026-08-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/06/%E4%BB%8E%E4%B8%80%E5%B0%81%E9%82%AE%E4%BB%B6%E5%BC%80%E5%A7%8B%EF%BC%9A%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA-Agent-Skill-%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/" title="从一封邮件开始：我的第一个 Agent Skill 开发记录">从一封邮件开始：我的第一个 Agent Skill 开发记录</a><time datetime="2026-08-06T06:41:37.000Z" title="Created 2026-08-06 14:41:37">2026-08-06</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/top_image.jpg);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harekasa</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div><div class="footer_custom_text">我始终如一 ~</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Toggle Between Traditional and Simplified Chinese">繁</button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><script src="/js/TabName.js"></script><script src="/js/tag-colorizer.js"></script><script type="module" src="/js/three-hero.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="80" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
