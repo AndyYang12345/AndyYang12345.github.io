@@ -1,0 +1,379 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>状态估计 | Ciallo(∠・ω&lt; )⌒☆</title><meta name="author" content="Harekasa"><meta name="copyright" content="Harekasa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F5F0FF"><meta name="description" content="在任何一次测量中，测量值满足的关系，即测量值等于实际值加物理残差，表示观测数据和实际数据之间存在随机变量r作为噪声。在随机噪声分布满足高斯分布时，，表示残差在没有系统误差的时候，符合标准差为的…">
+<meta property="og:type" content="website">
+<meta property="og:title" content="状态估计">
+<meta property="og:url" content="https://andyyang12345.github.io/kb/localization/core/state-estimation/index.html">
+<meta property="og:site_name" content="Ciallo(∠・ω&lt; )⌒☆">
+<meta property="og:description" content="在任何一次测量中，测量值满足的关系，即测量值等于实际值加物理残差，表示观测数据和实际数据之间存在随机变量r作为噪声。在随机噪声分布满足高斯分布时，，表示残差在没有系统误差的时候，符合标准差为的…">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://andyyang12345.github.io/img/github-profile.png">
+<meta property="article:published_time" content="2026-10-10T13:40:00.000Z">
+<meta property="article:modified_time" content="2026-10-10T14:38:25.860Z">
+<meta property="article:author" content="Harekasa">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://andyyang12345.github.io/img/github-profile.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/prts-512x512.png"><link rel="canonical" href="https://andyyang12345.github.io/kb/localization/core/state-estimation/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A2438')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F5F0FF')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '状态估计',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><style>
+  .kb-crumb{font-size:.85em;opacity:.65;margin:-.4em 0 1.4em;line-height:1.7}
+  .kb-crumb-sep{margin:0 .35em;opacity:.6}
+  .kb-crumb-cur{font-weight:600}
+</style>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">40</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/kb/"><i class="fa-fw fas fa-book"></i><span> 知识库</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-home-page" id="page-header" style="background-image: url(/img/top_image.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Ciallo(∠・ω&lt; )⌒☆</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/kb/"><i class="fa-fw fas fa-book"></i><span> 知识库</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="page-site-info"><h1 id="site-title">状态估计</h1></div></header><main class="layout" id="content-inner"><div id="page"><div class="container" id="article-container"><p class="kb-crumb"><a href="/kb/">知识库</a> <span class="kb-crumb-sep">›</span> <a href="/kb/localization/">定位仓库学习</a> <span class="kb-crumb-sep">›</span> <a href="/kb/localization/core/">核心算法</a> <span class="kb-crumb-sep">›</span> <span class="kb-crumb-cur">状态估计</span></p>
+
+<h2 id="状态估计和残差"><a href="#状态估计和残差" class="headerlink" title="状态估计和残差"></a>状态估计和残差</h2><h3 id="测量"><a href="#测量" class="headerlink" title="测量"></a>测量</h3><p>在任何一次测量中，测量值满足$z=r+\epsilon$的关系，即测量值等于实际值加物理残差，表示观测数据和实际数据之间存在随机变量r作为噪声。在随机噪声分布满足高斯分布时，$\epsilon\sim\mathcal{N}(0,\sigma^2)$，表示残差在没有系统误差的时候，符合标准差为$\sigma$的正态分布。当然实际过程中，误差并不严格遵守正态分布，故存在别的计算路径。</p>
+<p>在这里我们需要理清楚一些核心的概念和运算中会使用到的变量：</p>
+<ol>
+<li><p><strong>状态向量</strong>：表示最终需要求的所有关键参数，是一个很长很长的向量，在当前项目中表现为一个320维的向量，也就是320*1的矩阵。具体来说就是位姿啊速度加速度等，具体如下图实际内容更复杂，反正大致是这个意思，状态向量就包括了所有想要获取的参数，其中<strong>不</strong>包含观测矩阵内容！！</p>
+<p><code>20 帧 × 15 + 20 = 320</code>（其中逐帧状态 <code>20 × 15 = 300</code>）</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>每帧 &#x2F; 全局</th>
+<th>维度</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>逐帧</td>
+<td>每帧</td>
+<td>15</td>
+<td>速度(3) + 加计零偏(3) + 陀螺零偏(3) + 位置(3) + 姿态增量(3)</td>
+</tr>
+<tr>
+<td>全局</td>
+<td>—</td>
+<td>20</td>
+<td>尺度(1) + 世界对齐(6) + 时延(1) + 辅助位姿(6) + 地图变换(6)</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><strong>观测向量</strong>：传感器得到的数据矩阵， 一般来说会经过一些简单运算，比如预积分等操作。维度由观测器或者最终决定传入的维度决定，比如说视觉观测向量就是2维，imu帧率高，需要对若干帧进行预积分，得到进一步的数据后传入，最终应该是15维。</p>
+</li>
+<li><p><strong>代价函数</strong>：以状态向量为自变量的函数，通过预测向量与观测向量做差得到的物理残差白化后求和构建，至于白化是什么后面会详细介绍。总而言之，就是一个由观测和预测构建的标量函数，根据概率论推导，能够一定程度上描述该自变量取值的概率，其概率最大点，就是代价函数导数为0的点。当然这个导数为零的表述并不标准，实际上并不能直接进行求解，也很难有解析解。一般的工程实践是采用梯度下降或者高斯牛顿法对最低点进行逼近，在本仓库中反映为“Dogleg”法，也就是通过特定规范，对下降距离进行控制，后面也会详细介绍。</p>
+</li>
+<li><p><strong>预测矩阵</strong>：预先写死的转换矩阵，通过固定数学计算得到的矩阵，负责从状态矩阵映射到观测矩阵，具体使用后面详细介绍。</p>
+</li>
+<li><p><strong>残差</strong>：分为物理残差和白化残差，前者是预测向量减去测量向量得到的向量，表示当前预测和测量值的差距，包含单位；后者是使用物理残差除以残差协方差得到的向量，通过除以标准偏差，得到该测量值和实际值的偏差比例，比如说我一般来说的测量偏差为0.1m，也就是这个测量工具的误差标准差（协方差在一维的时候退化为方差），然后某一次测量的误差为3.25m，计算出来的偏差（白化残差）就是32.5个标准差，可以看出来这次测量非常的不准确，在后面的运算中就会转换成对估计值的纠正系数，反映为对状态向量的影响，也就是系统到底更相信测量值还是预测值。实际参与计算的残差来源可能很多，所以需要对所有残差都进行白化，得到单纯描述大小的白化残差才能加减。</p>
+</li>
+<li><p><strong>残差协方差</strong>：表示该残差的标准偏差，对于互相影响的变量来说（比如imu传入的旋转变量，与xyz三轴的数据变量都相关，残差也存在相关性），传入的是协方差。</p>
+</li>
+</ol>
+<h3 id="代价函数构建"><a href="#代价函数构建" class="headerlink" title="代价函数构建"></a>代价函数构建</h3><p>正如上面提到的那样，我们需要根据测量值和预测值构建一个标量函数，对其求导，得到该函数取最小值时的自变量取值，就是目标变量状态向量的取值。</p>
+<p>一般来说，根据不同观测变量满足的概率模型需要采用不同的构建形式：</p>
+<table>
+<thead>
+<tr>
+<th>噪声分布</th>
+<th>概率密度 ∝</th>
+<th>$-\ln p$</th>
+<th>代价形式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>高斯</td>
+<td>$\exp(-r^2/2\sigma^2)$</td>
+<td>$r^2/2\sigma^2$</td>
+<td>平方和（最小二乘）</td>
+</tr>
+<tr>
+<td>拉普拉斯</td>
+<td>$\exp(-\lvert r\rvert / b)$</td>
+<td>$\lvert r\rvert / b$</td>
+<td>绝对值和（L1）</td>
+</tr>
+<tr>
+<td>柯西</td>
+<td>$1/(1+r^2/a^2)$</td>
+<td>$\ln(1+r^2/a^2)$</td>
+<td>对数惩罚（鲁棒核）</td>
+</tr>
+</tbody></table>
+<p>从原理上看，一般出现的残差分布可以视为中心的高斯分布加上尾部的重尾分布，测量噪声本身是高斯（中心部分）。需要”重尾”是为了容纳那些根本不属于测量噪声的东西——误匹配、遮挡、尖峰。它们不是”噪声大”，而是数据错了。</p>
+<p>我们可以借用纯粹的高斯分布去进行理论的简单推导，得出上图中提到的：负对数满足二分之白化残差平方和的形式，然后使用这个进行后续的推导。在本仓库中，实际上对视觉和imu观测采用的都是柯西噪声的模型，让在核心数据之外的错误点对预测模型影响小一点。</p>
+<p>项目中的完整代价函数是这样的：</p>
+<p>$$F(x) = \underbrace{\sum_{\text{视觉}} \frac{1}{2} \ln\left(1 + \|r_{\text{vis}}\|^{2}\right)}_{\text{柯西负对数似然}}     + \underbrace{\sum_{\text{IMU}} 50 \ln\left(1 + \frac{\|r_{\text{imu}}\|^{2}}{100}\right)}_{\text{柯西负对数似然}}     + \underbrace{\frac{1}{2} \|r_{\text{prior}}\|^{2}}_{\text{高斯负对数先验}}$$</p>
+<p>可以看到，对于视觉和imu的观测向量，我们都采用的是柯西负对数似然，而后面还跟着一个高斯负对数先验，这个我在后面也会简单做一个介绍，大致来说就是一个之前状态得到的一组信息以及其残差，用于描述删帧后之前状态向量的可信度。</p>
+<p>这里提到了删帧的操作，这就不得不提及项目最关键的一点了，也就是通过滑动窗口进行预测，每一次都对往期一定窗口内的帧进行计算，可以在较小的运算复杂度内对数据进行反复线性化，避免传统batch思路堆积上下文，进而导致计算量骤增。</p>
+<p><strong>边缘化（marginalization）</strong>正是这里的关键操作。窗口满了要丢掉最老的帧时，<strong>不能直接删</strong>——那样这些帧带来的约束连同证据一起丢了，位姿会逐渐漂移，而协方差却虚假地变小。正确做法是把要移除的状态 $x_m$ 从联合分布里<strong>积分掉</strong>，用<a href="/kb/math/schur-complement/">Schur 补</a>把它的信息压缩成剩余状态 $x_r$ 上的一条<strong>稠密先验</strong>：</p>
+<p>$$H_{prior}=H_{rr}-H_{rm}H_{mm}^{-1}H_{mr},\qquad b_{prior}=b_r-H_{rm}H_{mm}^{-1}b_m$$</p>
+<p>这条先验在概念上等价于一次「<strong>虚拟观测</strong>」：它告诉优化器，这些变量应当取<strong>边缘化发生那一刻的值</strong>，而信心的度量就是 $H_{prior}$。所以总而言之，这里的操作通过一些运算<strong>保留了往期的状态信息</strong>，同时<strong>完全清除了之前帧在运算中的滞留</strong>。代价是矩阵会因填充效应（fill-in）变稠密——原本稀疏的 $H$ 在消元后会在被消变量的所有邻居之间两两产生新耦合。</p>
+<h3 id="代价函数的下降"><a href="#代价函数的下降" class="headerlink" title="代价函数的下降"></a>代价函数的下降</h3><p>本质上是求最小值，从路径上反映为高度的逐级下降，所以这一系列算法都在解决下降问题。</p>
+<p><a href="/kb/localization/core/least-squares/">最小二乘问题</a></p>
+<h3 id="Dogleg下降法"><a href="#Dogleg下降法" class="headerlink" title="Dogleg下降法"></a>Dogleg下降法</h3><p>狗腿法是该定位算法采用的下降思路，能够一定程度上减少迭代次数并智能更新步进距离。</p>
+<p><a href="/kb/localization/core/dogleg/">Dogleg算法</a></p>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harekasa</div><div class="author-info-description">Harekasa的个人博客，分享技术、生活和兴趣爱好。</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">40</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/andyyang12345"><i class="fab fa-github"></i><span>OMG its me  !</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/AndyYang12345" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:eeysy_harekasa@mail.scut.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/physics-lab-report-agent-skill/" title="把大学物理实验报告做成 Agent Skill">把大学物理实验报告做成 Agent Skill</a><time datetime="2026-09-18T12:11:29.000Z" title="Created 2026-09-18 20:11:29">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/drcom-and-syslog/" title="校园网 Dr.COM 客户端部署与 11 GB syslog 治理">校园网 Dr.COM 客户端部署与 11 GB syslog 治理</a><time datetime="2026-09-18T12:11:26.000Z" title="Created 2026-09-18 20:11:26">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/dsh-butler-memory/" title="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</a><time datetime="2026-09-18T12:11:23.000Z" title="Created 2026-09-18 20:11:23">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/ball-balancing-robot/" title="记2026年电赛H题：车载平衡滚球系统">记2026年电赛H题：车载平衡滚球系统</a><time datetime="2026-09-18T12:11:22.000Z" title="Created 2026-09-18 20:11:22">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/xorg-wayland-shortcuts/" title="关于xorg下wayland快捷操作的简单平替">关于xorg下wayland快捷操作的简单平替</a><time datetime="2026-08-06T07:13:52.000Z" title="Created 2026-08-06 15:13:52">2026-08-06</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/ai-tools/"><span class="card-category-list-name">AI工具</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/backend/"><span class="card-category-list-name">后端</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/embedded-development/"><span class="card-category-list-name">嵌入式开发</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/robotics/"><span class="card-category-list-name">机器人</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/operations/"><span class="card-category-list-name">运维</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/open-source/" style="font-size: 1.1em; color: #999">开源</a> <a href="/tags/environment-setup/" style="font-size: 1.1em; color: #999">环境部署</a> <a href="/tags/MaixCAM2/" style="font-size: 1.1em; color: #999">MaixCAM2</a> <a href="/tags/PostgreSQL/" style="font-size: 1.1em; color: #999">PostgreSQL</a> <a href="/tags/Ubuntu/" style="font-size: 1.1em; color: #999">Ubuntu</a> <a href="/tags/automation/" style="font-size: 1.1em; color: #999">自动化</a> <a href="/tags/OpenOCD/" style="font-size: 1.1em; color: #999">OpenOCD</a> <a href="/tags/systemd/" style="font-size: 1.1em; color: #999">systemd</a> <a href="/tags/DapLink/" style="font-size: 1.1em; color: #999">DapLink</a> <a href="/tags/campus-network/" style="font-size: 1.1em; color: #999">校园网</a> <a href="/tags/Codex/" style="font-size: 1.1em; color: #999">Codex</a> <a href="/tags/Agent-Skill/" style="font-size: 1.5em; color: #99a9bf">Agent Skill</a> <a href="/tags/SysConfig/" style="font-size: 1.1em; color: #999">SysConfig</a> <a href="/tags/STM32/" style="font-size: 1.1em; color: #999">STM32</a> <a href="/tags/TI/" style="font-size: 1.1em; color: #999">TI</a> <a href="/tags/docx/" style="font-size: 1.1em; color: #999">docx</a> <a href="/tags/AI/" style="font-size: 1.1em; color: #999">AI</a> <a href="/tags/CMake/" style="font-size: 1.1em; color: #999">CMake</a> <a href="/tags/embedded-vision/" style="font-size: 1.1em; color: #999">嵌入式视觉</a> <a href="/tags/DSH/" style="font-size: 1.1em; color: #999">DSH</a> <a href="/tags/VSCode/" style="font-size: 1.5em; color: #99a9bf">VSCode</a> <a href="/tags/Wayland/" style="font-size: 1.1em; color: #999">Wayland</a> <a href="/tags/machine-vision/" style="font-size: 1.1em; color: #999">机器视觉</a> <a href="/tags/MSPM0/" style="font-size: 1.1em; color: #999">MSPM0</a> <a href="/tags/rsyslog/" style="font-size: 1.1em; color: #999">rsyslog</a> <a href="/tags/GPT-SoVits/" style="font-size: 1.1em; color: #999">GPT-SoVits</a> <a href="/tags/Xorg/" style="font-size: 1.1em; color: #999">Xorg</a> <a href="/tags/physics-lab/" style="font-size: 1.1em; color: #999">物理实验</a> <a href="/tags/electronics-competition/" style="font-size: 1.1em; color: #999">电赛</a> <a href="/tags/plugin-development/" style="font-size: 1.1em; color: #999">插件开发</a> <a href="/tags/YOLO/" style="font-size: 1.1em; color: #999">YOLO</a> <a href="/tags/log-management/" style="font-size: 1.1em; color: #999">日志治理</a> <a href="/tags/embedded/" style="font-size: 1.1em; color: #999">嵌入式</a> <a href="/tags/embedded-development/" style="font-size: 1.1em; color: #999">嵌入式开发</a> <a href="/tags/GNOME/" style="font-size: 1.1em; color: #999">GNOME</a> <a href="/tags/MCP/" style="font-size: 1.1em; color: #999">MCP</a> <a href="/tags/long-term-memory/" style="font-size: 1.1em; color: #999">长期记忆</a> <a href="/tags/Python/" style="font-size: 1.1em; color: #999">Python</a> <a href="/tags/server-setup/" style="font-size: 1.1em; color: #999">服务器搭建</a> <a href="/tags/Linux/" style="font-size: 1.5em; color: #99a9bf">Linux</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/09/">
+            <span class="card-archive-list-date">
+              September 2026
+            </span>
+            <span class="card-archive-list-count">4</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/08/">
+            <span class="card-archive-list-date">
+              August 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/07/">
+            <span class="card-archive-list-date">
+              July 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/05/">
+            <span class="card-archive-list-date">
+              May 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/04/">
+            <span class="card-archive-list-date">
+              April 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">11</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">34.7k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-10-10T14:42:21.296Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/top_image.jpg);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harekasa</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div><div class="footer_custom_text">我始终如一 ~</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="translateLink" type="button" title="Toggle Between Traditional and Simplified Chinese">繁</button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script src="/js/TabName.js"></script><script src="/js/tag-colorizer.js"></script><script type="module" src="/js/three-hero.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="80" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="搜索文章与知识库笔记" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

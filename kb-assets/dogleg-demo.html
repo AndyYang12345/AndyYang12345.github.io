@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Dogleg 信赖域演示 · Rosenbrock 山谷</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 18px;
+    background: #12151c; color: #d8dee9;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px; line-height: 1.6;
+  }
+  h1 { font-size: 19px; margin: 0 0 4px; color: #e8eef8; font-weight: 600; }
+  .sub { color: #7c8798; font-size: 13px; margin-bottom: 16px; }
+  .wrap { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+  canvas { border-radius: 8px; display: block; background: #0d1017; }
+  .panel {
+    background: #1a1f2a; border: 1px solid #262d3b; border-radius: 8px;
+    padding: 14px; min-width: 320px; flex: 1; max-width: 420px;
+  }
+  .panel h2 {
+    font-size: 12px; margin: 0 0 10px; color: #8f9bb0; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+  }
+  .row { display: flex; justify-content: space-between; padding: 2.5px 0; }
+  .row .k { color: #8f9bb0; font-size: 13px; }
+  .row .v { font-family: "SF Mono", Menlo, Consolas, monospace; color: #cdd6e4; font-size: 13px; }
+  .btns { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+  button {
+    background: #2c3547; color: #d8dee9; border: 1px solid #3a4459;
+    padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    font-family: inherit; transition: .12s;
+  }
+  button:hover { background: #38435a; border-color: #4a5670; }
+  button.primary { background: #2b5c8a; border-color: #3d78ad; }
+  button.primary:hover { background: #356d9f; }
+  label.slider { display: block; margin: 14px 0 5px; color: #8f9bb0; font-size: 13px; }
+  input[type=range] { width: 100%; accent-color: #f0a35e; }
+  .legend { margin-top: 14px; font-size: 12.5px; }
+  .legend div { display: flex; align-items: center; gap: 8px; padding: 2.5px 0; }
+  .swatch { width: 22px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .note {
+    background: #1a1f2a; border: 1px solid #262d3b; border-left: 3px solid #4a9eff;
+    border-radius: 6px; padding: 12px 14px; margin-top: 16px; font-size: 13px;
+    color: #a8b3c5; max-width: 1120px;
+  }
+  .note b { color: #cdd6e4; }
+  .note ol { margin: 6px 0 0; padding-left: 20px; }
+  .note li { margin: 4px 0; }
+  code { font-family: "SF Mono", Menlo, monospace; background: #232a38;
+         padding: 1px 5px; border-radius: 3px; font-size: 12.5px; color: #9dc4f0; }
+  .hl { color: #4ade80; }
+  .hl2 { color: #f87171; }
+  .hl3 { color: #f0a35e; }
+  #log { font-family: "SF Mono", Menlo, monospace; font-size: 11px;
+         color: #7c8798; height: 118px; overflow-y: auto; margin-top: 10px;
+         background: #0d1017; border-radius: 5px; padding: 7px 9px; }
+  #log div { white-space: nowrap; }
+  .v-acc { color: #4ade80; }
+  .v-rej { color: #f87171; }
+  .flash { animation: fl .45s ease-out; }
+  @keyframes fl { 0% { box-shadow: 0 0 0 0 rgba(248,113,113,.65); }
+                  100% { box-shadow: 0 0 0 22px rgba(248,113,113,0); } }
+</style>
+</head>
+<body>
+
+<h1>Dogleg 信赖域演示 · Rosenbrock 山谷</h1>
+<div class="sub">
+  代价函数 f(x,y) = (1&minus;x)² + 20(y&minus;x²)²　——　弯曲狭长山谷，最小值在 <b style="color:#f87171">(1, 1)</b>
+</div>
+
+<div class="wrap">
+  <div>
+    <canvas id="main" width="660" height="470"></canvas>
+    <canvas id="chart" width="660" height="122" style="margin-top:12px"></canvas>
+  </div>
+
+  <div class="panel" id="panelbox">
+    <h2>当前迭代</h2>
+    <div class="row"><span class="k">位置 (x, y)</span><span class="v" id="v-pos">—</span></div>
+    <div class="row"><span class="k">代价 f</span><span class="v" id="v-cost">—</span></div>
+    <div class="row"><span class="k">梯度模 ‖g‖</span><span class="v" id="v-gnorm">—</span></div>
+    <hr style="border:0;border-top:1px solid #262d3b;margin:9px 0">
+    <div class="row"><span class="k">信赖域半径 r</span><span class="v" id="v-radius" style="color:#f0a35e">—</span></div>
+    <div class="row"><span class="k">‖Δ 高斯牛顿‖</span><span class="v" id="v-pgn" style="color:#4a9eff">—</span></div>
+    <div class="row"><span class="k">‖Δ 最速下降‖</span><span class="v" id="v-psd" style="color:#4ade80">—</span></div>
+    <div class="row"><span class="k">实际步长 ‖Δ‖</span><span class="v" id="v-step" style="color:#fff">—</span></div>
+    <div class="row"><span class="k">走哪条分支</span><span class="v" id="v-branch">—</span></div>
+    <hr style="border:0;border-top:1px solid #262d3b;margin:9px 0">
+    <div class="row"><span class="k">预测下降</span><span class="v" id="v-pred">—</span></div>
+    <div class="row"><span class="k">实际下降</span><span class="v" id="v-act">—</span></div>
+    <div class="row"><span class="k">质量比 ρ = 实际/预测</span><span class="v" id="v-rho">—</span></div>
+    <div class="row"><span class="k">判定</span><span class="v" id="v-verdict">—</span></div>
+
+    <label class="slider">手动调半径 r = <span id="v-rm" style="color:#f0a35e">0.300</span></label>
+    <input type="range" id="radius" min="0.02" max="3.00" step="0.005" value="0.30">
+
+    <div class="btns">
+      <button class="primary" id="play">▶ 自动迭代</button>
+      <button id="step">单步</button>
+      <button id="reset">重置</button>
+    </div>
+
+    <div class="legend">
+      <div><span class="swatch" style="background:#4a9eff"></span>高斯牛顿步 Δ<sub>gn</sub>（用曲率，方向准）</div>
+      <div><span class="swatch" style="background:#4ade80"></span>最速下降步 Δ<sub>sd</sub>（只用梯度，保守）</div>
+      <div><span class="swatch" style="background:#f0a35e"></span>Dogleg 折线：起点 → Δ<sub>sd</sub> → Δ<sub>gn</sub></div>
+      <div><span class="dot" style="background:rgba(240,163,94,.3);border:1px solid #f0a35e"></span>信赖域圆（半径 r）</div>
+      <div><span class="dot" style="background:#ffffff"></span>当前位置　<span class="dot" style="background:#f87171"></span>最优点 (1,1)</div>
+    </div>
+    <div id="log"></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>建议按这个顺序玩：</b>
+  <ol>
+    <li><b>先拖动半径滑块（不要点单步）</b>：看折线怎么被信赖域圆截断。
+      半径很小 → 走纯梯度方向（绿）；半径很大 → 直接走高斯牛顿步（蓝）；中间 → 落在橙色折线上。</li>
+    <li><b>再点「单步」几次</b>：看每一步的 ρ（质量比）。ρ≈1 说明二次模型预测得准。</li>
+    <li><b>一直点下去</b>：会遇到 <span class="hl2">ρ &lt; 0 的步（红色拒绝）</span>——高斯牛顿步跨过弯曲山谷冲到对面，代价反而上升，于是回滚、半径减半。
+      这就是<span class="hl3">动态半径</span>的核心：<b>步子迈大了就缩，走得好就放大</b>。</li>
+    <li>看下方曲线：<b>橙线是半径的演化</b>，点的颜色是 ρ（<span class="hl">绿=准</span>／<span class="hl2">红=差</span>）。</li>
+  </ol>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// 代价函数：Rosenbrock  f = (1−x)² + K(y−x²)²    最小值 (1,1)，f=0
+// ─────────────────────────────────────────────────────────────
+const K = 20;
+
+function f(x, y)       { const t = y - x*x; return (1-x)*(1-x) + K*t*t; }
+function grad(x, y)    { const t = y - x*x;
+                         return [-2*(1-x) - 4*K*x*t, 2*K*t]; }
+function hess(x, y)    { const t = y - x*x;
+                         return [[2 + 12*K*x*x - 4*K*y, -4*K*x],
+                                 [-4*K*x,              2*K    ]]; }
+
+const OPT = [1, 1];                       // 最优点
+
+// 世界坐标 → 画布（等比例，保证信赖域圆画出来是正圆）
+const cv = document.getElementById('main'), ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height, MARGIN = 36;
+const PW = W - MARGIN*2, PH = H - MARGIN*2;
+const XR = 3.25;                          // x 方向跨度
+const YR = XR * PH / PW;                  // y 跨度由等比例推出
+const XC = 0.0, YC = 0.53;                // 视野中心
+const VIEW = { x0: XC - XR/2, x1: XC + XR/2, y0: YC - YR/2, y1: YC + YR/2 };
+
+function w2c(x, y) {
+  return [MARGIN + (x - VIEW.x0)/(VIEW.x1-VIEW.x0)*PW,
+          MARGIN + (VIEW.y1 - y)/(VIEW.y1-VIEW.y0)*PH];
+}
+function c2w(px, py) {
+  return [VIEW.x0 + (px-MARGIN)/PW*(VIEW.x1-VIEW.x0),
+          VIEW.y1 - (py-MARGIN)/PH*(VIEW.y1-VIEW.y0)];
+}
+const SCALE = PW / XR;                    // 世界单位 → 像素（各向同性）
+
+// ─────────────────────────────────────────────────────────────
+// 背景：热力图 + 等高线（静态，只构造一次）
+// ─────────────────────────────────────────────────────────────
+const bg = document.createElement('canvas');
+bg.width = W; bg.height = H;
+
+(function buildBackground() {
+  const bctx = bg.getContext('2d');
+  const img = bctx.createImageData(W, H);
+  const d = img.data;
+  const FMAX = 16;
+  const levels = [0.02,0.06,0.15,0.3,0.6,1.2,2.2,3.5,5.5,8,11,14.5];
+
+  const F = new Float32Array(W*H);
+  for (let py = 0; py < H; py++)
+    for (let px = 0; px < W; px++) {
+      const [x, y] = c2w(px, py);
+      F[py*W+px] = f(x, y);
+    }
+
+  for (let py = 0; py < H; py++) {
+    for (let px = 0; px < W; px++) {
+      const i = py*W + px, v = F[i];
+      const t = Math.min(1, Math.pow(v/FMAX, 0.33));
+      let r = Math.round(13 + t*86), g = Math.round(16 + t*50), b = Math.round(24 + t*38);
+
+      const inPlot = px > MARGIN-2 && px < W-MARGIN+2 && py > MARGIN-2 && py < H-MARGIN+2;
+      if (inPlot) {
+        for (const L of levels) {
+          const rt = px+1 < W ? F[i+1] : v, dn = py+1 < H ? F[i+W] : v;
+          if ((v-L)*(rt-L) < 0 || (v-L)*(dn-L) < 0) {
+            const w = L < 0.4 ? 0.9 : (L < 3 ? 0.52 : 0.26);
+            r = Math.round(r*(1-w) + 165*w);
+            g = Math.round(g*(1-w) + 185*w);
+            b = Math.round(b*(1-w) + 225*w);
+            break;
+          }
+        }
+      } else { r = 13; g = 16; b = 24; }
+
+      const o = i*4;
+      d[o] = r; d[o+1] = g; d[o+2] = b; d[o+3] = 255;
+    }
+  }
+  bctx.putImageData(img, 0, 0);
+
+  // 谷底曲线 y = x²（虚线提示山谷走向）
+  bctx.beginPath();
+  let started = false;
+  for (let px = 0; px <= PW; px++) {
+    const x = VIEW.x0 + px/PW*XR, y = x*x;
+    const [cx, cy] = w2c(x, y);
+    if (cy < MARGIN || cy > H-MARGIN) { started = false; continue; }
+    if (!started) { bctx.moveTo(cx, cy); started = true; } else bctx.lineTo(cx, cy);
+  }
+  bctx.strokeStyle = 'rgba(120,200,160,.35)';
+  bctx.lineWidth = 1.5; bctx.setLineDash([4,4]); bctx.stroke();
+  bctx.setLineDash([]);
+
+  // 坐标轴
+  bctx.strokeStyle = '#2b3344'; bctx.lineWidth = 1;
+  let p = w2c(0, VIEW.y0); bctx.beginPath(); bctx.moveTo(p[0], p[1]);
+  p = w2c(0, VIEW.y1); bctx.lineTo(p[0], p[1]); bctx.stroke();
+  p = w2c(VIEW.x0, 0); bctx.beginPath(); bctx.moveTo(p[0], p[1]);
+  p = w2c(VIEW.x1, 0); bctx.lineTo(p[0], p[1]); bctx.stroke();
+
+  bctx.fillStyle = '#5a6478'; bctx.font = '11px monospace';
+  for (let x = -1.5; x <= 1.51; x += 0.5) {
+    const [cx, cy] = w2c(x, VIEW.y0);
+    bctx.fillText(x.toFixed(1), cx-11, H-13);
+  }
+  for (let y = -0.5; y <= 1.51; y += 0.5) {
+    const [cx, cy] = w2c(VIEW.x0, y);
+    bctx.fillText(y.toFixed(1), 6, cy+4);
+  }
+  // 谷底标注
+  const [lx, ly] = w2c(-1.35, 1.82);
+  bctx.fillStyle = 'rgba(120,200,160,.6)'; bctx.font = '11px sans-serif';
+  if (ly > MARGIN && ly < H) bctx.fillText('谷底 y = x²', lx, ly);
+})();
+
+// ─────────────────────────────────────────────────────────────
+// Dogleg 核心
+// ─────────────────────────────────────────────────────────────
+function dogleg(x, y, radius) {
+  const g = grad(x, y), Hm = hess(x, y);
+  const gnorm = Math.hypot(g[0], g[1]);
+  const gnorm2 = g[0]*g[0] + g[1]*g[1];
+  const det = Hm[0][0]*Hm[1][1] - Hm[0][1]*Hm[1][0];
+
+  // 高斯牛顿步：解 H·Δ = −g（H 退化时退回最速下降）
+  let gnv;
+  if (Math.abs(det) < 1e-12) { gnv = null; }
+  else {
+    gnv = [-(Hm[1][1]*g[0] - Hm[0][1]*g[1])/det,
+           -(-Hm[1][0]*g[0] + Hm[0][0]*g[1])/det];
+    if (!isFinite(gnv[0]) || !isFinite(gnv[1]) ||
+        (g[0]*gnv[0] + g[1]*gnv[1]) >= 0) gnv = null;   // 非下降方向 → 弃用
+  }
+
+  // 最速下降步
+  const Hg  = [Hm[0][0]*g[0] + Hm[0][1]*g[1], Hm[1][0]*g[0] + Hm[1][1]*g[1]];
+  const gHg = g[0]*Hg[0] + g[1]*Hg[1];
+  const alpha = gHg > 0 ? gnorm2/gHg : 0;
+  const sd = [-alpha*g[0], -alpha*g[1]];
+
+  const pgn = gnv ? Math.hypot(gnv[0], gnv[1]) : Infinity;
+  const psd = Math.hypot(sd[0], sd[1]);
+
+  let step, branch;
+  if (gnv && pgn <= radius) {                  // ① 整个 GN 步都在圈内
+    step = gnv; branch = '① 全高斯牛顿';
+  } else if (psd >= radius) {                  // ② 连 SD 步都超出圈
+    const s = radius / gnorm;
+    step = [-s*g[0], -s*g[1]];
+    branch = '② 纯梯度截断';
+  } else {                                     // ③ 折线与圈的交点
+    const d = [gnv[0]-sd[0], gnv[1]-sd[1]];
+    const A = d[0]*d[0] + d[1]*d[1];
+    const B = 2*(sd[0]*d[0] + sd[1]*d[1]);
+    const C = sd[0]*sd[0] + sd[1]*sd[1] - radius*radius;
+    const t = (-B + Math.sqrt(Math.max(0, B*B - 4*A*C))) / (2*A);
+    step = [sd[0] + t*d[0], sd[1] + t*d[1]];
+    branch = '③ 折线插值';
+  }
+
+  // 预测下降（二次模型）：−gᵀΔ − ½ΔᵀHΔ
+  const Hd = [Hm[0][0]*step[0] + Hm[0][1]*step[1], Hm[1][0]*step[0] + Hm[1][1]*step[1]];
+  const pred = -(g[0]*step[0] + g[1]*step[1]) - 0.5*(step[0]*Hd[0] + step[1]*Hd[1]);
+
+  return { gn: gnv || sd, sd, step, pred, pgn, psd, gnorm, branch,
+           norm: Math.hypot(step[0], step[1]) };
+}
+
+// ─────────────────────────────────────────────────────────────
+// 状态
+// ─────────────────────────────────────────────────────────────
+const START = [-1.20, 1.00];
+const R0 = 0.30;
+let pos, radius, trail, iter, playing, timer, radiusHist, rejectedFlash;
+
+const chart = document.getElementById('chart'), cctx = chart.getContext('2d');
+
+function reset() {
+  pos = START.slice();
+  radius = R0;
+  trail = [pos.slice()];
+  iter = 0; playing = false; rejectedFlash = 0;
+  radiusHist = [{ r: radius, rho: null }];
+  document.getElementById('radius').value = radius;
+  document.getElementById('v-rm').textContent = radius.toFixed(3);
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('v-act').textContent = '—';
+  document.getElementById('v-rho').textContent = '—';
+  document.getElementById('v-verdict').textContent = '—';
+  document.getElementById('v-verdict').className = 'v';
+  updatePlayBtn();
+  draw();
+}
+
+function updatePlayBtn() {
+  document.getElementById('play').textContent = playing ? '❚❚ 暂停' : '▶ 自动迭代';
+}
+
+// ─────────────────────────────────────────────────────────────
+// 主图
+// ─────────────────────────────────────────────────────────────
+function draw(previewRadius) {
+  ctx.drawImage(bg, 0, 0);
+
+  const R = previewRadius !== undefined ? previewRadius : radius;
+  const d = dogleg(pos[0], pos[1], R);
+
+  const [cx, cy] = w2c(pos[0], pos[1]);
+
+  // 信赖域圆
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R*SCALE, 0, 2*Math.PI);
+  ctx.fillStyle = 'rgba(240,163,94,.09)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(240,163,94,.8)';
+  ctx.lineWidth = 1.5; ctx.setLineDash([5,4]); ctx.stroke();
+  ctx.restore();
+
+  // 历史轨迹
+  if (trail.length > 1) {
+    ctx.beginPath();
+    const s = w2c(trail[0][0], trail[0][1]);
+    ctx.moveTo(s[0], s[1]);
+    for (let i = 1; i < trail.length; i++) {
+      const q = w2c(trail[i][0], trail[i][1]);
+      ctx.lineTo(q[0], q[1]);
+    }
+    ctx.strokeStyle = 'rgba(232,238,248,.55)';
+    ctx.lineWidth = 1.6; ctx.setLineDash([3,3]); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function arrow(dx, dy, color, lw, dash, label) {
+    const [ex, ey] = w2c(pos[0]+dx, pos[1]+dy);
+    ctx.save();
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.setLineDash([]);
+    const ang = Math.atan2(ey-cy, ex-cx), hs = Math.max(7, lw*4);
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - hs*Math.cos(ang-0.42), ey - hs*Math.sin(ang-0.42));
+    ctx.lineTo(ex - hs*Math.cos(ang+0.42), ey - hs*Math.sin(ang+0.42));
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.font = '700 13px -apple-system, sans-serif';
+      ctx.fillText(label, ex + 9*Math.cos(ang), ey + 9*Math.sin(ang) + 5);
+    }
+    ctx.restore();
+  }
+
+  // Dogleg 折线
+  const sdP = w2c(pos[0]+d.sd[0], pos[1]+d.sd[1]);
+  const gnP = w2c(pos[0]+d.gn[0], pos[1]+d.gn[1]);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(240,163,94,.5)';
+  ctx.lineWidth = 1.6; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sdP[0], sdP[1]); ctx.lineTo(gnP[0], gnP[1]);
+  ctx.stroke(); ctx.restore();
+
+  if (isFinite(d.pgn)) arrow(d.gn[0], d.gn[1], 'rgba(74,158,255,.5)', 1.7, [4,3], null);
+  arrow(d.sd[0], d.sd[1], 'rgba(74,222,128,.5)', 1.7, [4,3], null);
+  arrow(d.step[0], d.step[1], '#ffffff', 2.6, null, 'Δ');
+
+  // 最优点
+  const [ox, oy] = w2c(OPT[0], OPT[1]);
+  ctx.strokeStyle = '#f87171'; ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(ox-6, oy-6); ctx.lineTo(ox+6, oy+6);
+  ctx.moveTo(ox+6, oy-6); ctx.lineTo(ox-6, oy+6);
+  ctx.stroke();
+
+  // 当前点（拒绝时闪红）
+  ctx.beginPath(); ctx.arc(cx, cy, 5.5, 0, 2*Math.PI);
+  ctx.fillStyle = rejectedFlash > 0 ? '#f87171' : '#e8eef8';
+  ctx.fill();
+  ctx.strokeStyle = '#12151c'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.fillStyle = '#8f9bb0'; ctx.font = '12px -apple-system, sans-serif';
+  ctx.fillText('迭代 ' + iter + '　r = ' + R.toFixed(3), MARGIN+6, MARGIN-11);
+
+  return d;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 半径演化图
+// ─────────────────────────────────────────────────────────────
+function drawChart() {
+  const w = chart.width, h = chart.height;
+  cctx.clearRect(0, 0, w, h);
+  cctx.fillStyle = '#0d1017'; cctx.fillRect(0, 0, w, h);
+  cctx.strokeStyle = '#262d3b'; cctx.lineWidth = 1; cctx.strokeRect(.5, .5, w-1, h-1);
+
+  const pts = radiusHist;
+  if (pts.length < 2) {
+    cctx.fillStyle = '#5a6478'; cctx.font = '12px -apple-system, sans-serif';
+    cctx.fillText('信赖域半径 r 随迭代的演化（点「单步」或「自动迭代」后出现）', 14, h/2+4);
+    return;
+  }
+
+  const rmax = Math.max(...pts.map(p => p.r), 0.3) * 1.18;
+  const n = pts.length;
+  const X = i => 52 + (n === 1 ? 0 : i/(n-1))*(w-78);
+  const Y = r => h - 24 - (r/rmax)*(h-46);
+
+  cctx.strokeStyle = '#1e2431'; cctx.lineWidth = 1;
+  for (let k = 0; k <= 4; k++) {
+    const yy = 18 + k*(h-46)/4;
+    cctx.beginPath(); cctx.moveTo(52, yy); cctx.lineTo(w-14, yy); cctx.stroke();
+  }
+
+  cctx.beginPath();
+  pts.forEach((p, i) => i ? cctx.lineTo(X(i), Y(p.r)) : cctx.moveTo(X(i), Y(p.r)));
+  cctx.strokeStyle = '#f0a35e'; cctx.lineWidth = 2; cctx.stroke();
+
+  pts.forEach((p, i) => {
+    let col = '#5a6478';
+    if (p.rho !== null && isFinite(p.rho)) {
+      const t = Math.max(0, Math.min(1, p.rho));
+      col = `rgb(${Math.round(248 - t*174)},${Math.round(113 + t*109)},${Math.round(113 + 13)})`;
+    }
+    cctx.beginPath(); cctx.arc(X(i), Y(p.r), 4, 0, 2*Math.PI);
+    cctx.fillStyle = col; cctx.fill();
+  });
+
+  cctx.fillStyle = '#8f9bb0'; cctx.font = '11px monospace';
+  cctx.fillText(rmax.toFixed(2), 12, 26);
+  cctx.fillText('r', 20, 26);
+  cctx.fillText('0', 30, h-8);
+  cctx.fillStyle = '#5a6478'; cctx.font = '11px -apple-system, sans-serif';
+  cctx.fillText('迭代次数 →', w-92, h-8);
+  cctx.fillStyle = '#7c8798';
+  cctx.fillText('点色 = 质量比 ρ（绿≈1 准 / 红<0 差，步被拒绝）', 58, h-8);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 数值面板
+// ─────────────────────────────────────────────────────────────
+function updatePanel(d, rho, act, verdict) {
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  set('v-pos', `(${pos[0].toFixed(4)}, ${pos[1].toFixed(4)})`);
+  set('v-cost', f(pos[0], pos[1]).toExponential(4));
+  set('v-gnorm', d.gnorm.toFixed(4));
+  set('v-radius', radius.toFixed(4));
+  set('v-pgn', isFinite(d.pgn) ? d.pgn.toFixed(4) : '∞');
+  set('v-psd', d.psd.toFixed(4));
+  set('v-step', d.norm.toFixed(4));
+  set('v-branch', d.branch);
+  set('v-pred', d.pred.toExponential(4));
+  set('v-act', act === null ? '—' : act.toExponential(4));
+  const rhoEl = document.getElementById('v-rho');
+  rhoEl.textContent = (rho === null || !isFinite(rho)) ? '—' : rho.toFixed(4);
+  rhoEl.style.color = rho === null ? '#cdd6e4'
+                    : rho > 0.75 ? '#4ade80'
+                    : rho > 0.25 ? '#e5c07b' : '#f87171';
+  const vEl = document.getElementById('v-verdict');
+  vEl.textContent = verdict || '—';
+  vEl.className = 'v ' + (verdict === '接受' ? 'v-acc' : verdict === '拒绝' ? 'v-rej' : '');
+}
+
+// ─────────────────────────────────────────────────────────────
+// 单步
+// ─────────────────────────────────────────────────────────────
+function doStep() {
+  const x = pos[0], y = pos[1];
+  const d = dogleg(x, y, radius);
+  const f0 = f(x, y);
+  const f1 = f(x + d.step[0], y + d.step[1]);
+  const act = f0 - f1;
+  const rho = d.pred > 0 ? act / d.pred : -Infinity;
+
+  let verdict, nr = radius;
+  if (!(rho > 1e-3) || !isFinite(rho)) {         // 拒绝：回滚 + 半径减半
+    verdict = '拒绝';
+    nr = radius * 0.5;
+    rejectedFlash = 1;
+    const box = document.getElementById('panelbox');
+    box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+  } else {                                       // 接受
+    verdict = '接受';
+    rejectedFlash = 0;
+    pos = [x + d.step[0], y + d.step[1]];
+    trail.push(pos.slice());
+    if (rho < 0.25)      nr = radius * 0.5;                       // 模型偏乐观 → 缩
+    else if (rho > 0.75) nr = Math.max(radius, 3*d.norm);         // 模型可信 → 放大
+  }
+  nr = Math.max(0.015, Math.min(3.0, nr));
+
+  updatePanel(d, rho, act, verdict);
+
+  const log = document.getElementById('log');
+  const row = document.createElement('div');
+  row.innerHTML = `<span class="${verdict === '接受' ? 'v-acc' : 'v-rej'}">${verdict}</span>`
+    + ` it${String(iter).padStart(2)}  r ${radius.toFixed(3)}→${nr.toFixed(3)}`
+    + `  ρ=${isFinite(rho) ? rho.toFixed(3).padStart(7) : '    —  '}`
+    + `  ‖Δ‖=${d.norm.toFixed(3)}  ${d.branch}`;
+  log.appendChild(row); log.scrollTop = log.scrollHeight;
+
+  radius = nr;
+  iter++;
+  radiusHist.push({ r: radius, rho: isFinite(rho) ? rho : null });
+  document.getElementById('radius').value = radius;
+  document.getElementById('v-rm').textContent = radius.toFixed(3);
+
+  draw();
+  drawChart();
+
+  if (Math.hypot(pos[0]-OPT[0], pos[1]-OPT[1]) < 2e-4 || iter > 40) {
+    playing = false; updatePlayBtn(); clearInterval(timer);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 交互
+// ─────────────────────────────────────────────────────────────
+document.getElementById('radius').addEventListener('input', e => {
+  const r = parseFloat(e.target.value);
+  document.getElementById('v-rm').textContent = r.toFixed(3);
+  if (playing) return;
+  const d = draw(r);                       // 只预览，不改状态
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  set('v-radius', r.toFixed(4));
+  set('v-pos', `(${pos[0].toFixed(4)}, ${pos[1].toFixed(4)})`);
+  set('v-cost', f(pos[0], pos[1]).toExponential(4));
+  set('v-gnorm', d.gnorm.toFixed(4));
+  set('v-pgn', isFinite(d.pgn) ? d.pgn.toFixed(4) : '∞');
+  set('v-psd', d.psd.toFixed(4));
+  set('v-step', d.norm.toFixed(4));
+  set('v-branch', d.branch);
+  set('v-pred', d.pred.toExponential(4));
+  set('v-act', '—'); set('v-rho', '—');
+  const vEl = document.getElementById('v-verdict');
+  vEl.textContent = '预览（未迭代）'; vEl.className = 'v';
+});
+
+document.getElementById('play').addEventListener('click', () => {
+  playing = !playing; updatePlayBtn(); clearInterval(timer);
+  if (playing) timer = setInterval(() => { if (playing) doStep(); }, 750);
+});
+
+document.getElementById('step').addEventListener('click', () => {
+  playing = false; clearInterval(timer); updatePlayBtn(); doStep();
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  clearInterval(timer); reset(); drawChart();
+});
+
+reset();
+drawChart();
+</script>
+</body>
+</html>

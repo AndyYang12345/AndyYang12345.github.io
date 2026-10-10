@@ -1,0 +1,478 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>整体流程：从 IMU 样本到状态估计 | Ciallo(∠・ω&lt; )⌒☆</title><meta name="author" content="Harekasa"><meta name="copyright" content="Harekasa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F5F0FF"><meta name="description" content="一句话记住：预积分是「算」，不是「估」。它把 100 个 IMU 样本压缩成一个约束；真正的估计发生在窗口优化层面，不在预积分里。容易误解的地方：「持续」的是 IMU 样本的缓存，不是积分本身…">
+<meta property="og:type" content="website">
+<meta property="og:title" content="整体流程：从 IMU 样本到状态估计">
+<meta property="og:url" content="https://andyyang12345.github.io/kb/localization/core/frontend/imu-preintegration/pipeline/index.html">
+<meta property="og:site_name" content="Ciallo(∠・ω&lt; )⌒☆">
+<meta property="og:description" content="一句话记住：预积分是「算」，不是「估」。它把 100 个 IMU 样本压缩成一个约束；真正的估计发生在窗口优化层面，不在预积分里。容易误解的地方：「持续」的是 IMU 样本的缓存，不是积分本身…">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://andyyang12345.github.io/img/github-profile.png">
+<meta property="article:published_time" content="2026-10-10T13:33:00.000Z">
+<meta property="article:modified_time" content="2026-10-10T14:38:25.859Z">
+<meta property="article:author" content="Harekasa">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://andyyang12345.github.io/img/github-profile.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/prts-512x512.png"><link rel="canonical" href="https://andyyang12345.github.io/kb/localization/core/frontend/imu-preintegration/pipeline/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A2438')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F5F0FF')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '整体流程：从 IMU 样本到状态估计',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><style>
+  .kb-crumb{font-size:.85em;opacity:.65;margin:-.4em 0 1.4em;line-height:1.7}
+  .kb-crumb-sep{margin:0 .35em;opacity:.6}
+  .kb-crumb-cur{font-weight:600}
+</style>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">40</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/kb/"><i class="fa-fw fas fa-book"></i><span> 知识库</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-home-page" id="page-header" style="background-image: url(/img/top_image.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Ciallo(∠・ω&lt; )⌒☆</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/kb/"><i class="fa-fw fas fa-book"></i><span> 知识库</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-file-powerpoint"></i><span> 汇报文稿</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/mygo-presentation/"><i class="fa-fw fas fa-robot"></i><span> MyGo 机器人汇报</span></a></li><li><a class="site-page child" href="/ti-project-assistant/"><i class="fa-fw fas fa-microchip"></i><span> Ti-Project-Assistant</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/TPA/"><i class="fa-fw fas fa-terminal"></i><span> TPA 快速参考</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="page-site-info"><h1 id="site-title">整体流程：从 IMU 样本到状态估计</h1></div></header><main class="layout" id="content-inner"><div id="page"><div class="container" id="article-container"><p class="kb-crumb"><a href="/kb/">知识库</a> <span class="kb-crumb-sep">›</span> <a href="/kb/localization/">定位仓库学习</a> <span class="kb-crumb-sep">›</span> <a href="/kb/localization/core/">核心算法</a> <span class="kb-crumb-sep">›</span> <a href="/kb/localization/core/frontend/">前端</a> <span class="kb-crumb-sep">›</span> <a href="/kb/localization/core/frontend/imu-preintegration/">IMU预积分</a> <span class="kb-crumb-sep">›</span> <span class="kb-crumb-cur">整体流程：从 IMU 样本到状态估计</span></p>
+
+<div class="note primary flat"><p>一句话记住：<strong>预积分是「算」，不是「估」</strong>。它把 100 个 IMU 样本压缩成<strong>一个约束</strong>；真正的<strong>估计发生在窗口优化层面</strong>，不在预积分里。</p>
+</div>
+
+<h2 id="一、三层分工"><a href="#一、三层分工" class="headerlink" title="一、三层分工"></a>一、三层分工</h2><table>
+<thead>
+<tr>
+<th>层</th>
+<th>做什么</th>
+<th>频率</th>
+<th>有没有优化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>① 缓存层</td>
+<td>IMU 样本入队（$\texttt{pushSample()}$）</td>
+<td>1000 Hz</td>
+<td>❌ 纯缓存，连加法都没有</td>
+</tr>
+<tr>
+<td>② 预积分层</td>
+<td>批量数值积分 + 敏感度累积 + 协方差传播</td>
+<td>每个图像帧一次</td>
+<td>❌ 纯计算</td>
+</tr>
+<tr>
+<td>③ 优化层</td>
+<td>用所有边的残差解位姿 &#x2F; 速度 &#x2F; 零偏</td>
+<td>每个图像帧一次</td>
+<td>✅ <strong>估计只在这里</strong></td>
+</tr>
+</tbody></table>
+<h2 id="二、三条解耦的时间线"><a href="#二、三条解耦的时间线" class="headerlink" title="二、三条解耦的时间线"></a>二、三条解耦的时间线</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">时间 ────────────────────────────────────────────────────────────►</span><br><span class="line"></span><br><span class="line">【① IMU 样本流】1000 Hz</span><br><span class="line">  ▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪</span><br><span class="line">  └──── pushSample()：只往 pending 队列里塞，不算任何东西 ────┘</span><br><span class="line"></span><br><span class="line">【② 图像帧流】10 Hz</span><br><span class="line">  ●──────────────────────────────●──────────────────────────────●──</span><br><span class="line">  帧k                            帧k+1                          帧k+2</span><br><span class="line">                                 │</span><br><span class="line">                                 └─ appendFrame() 被调用</span><br><span class="line">                                    ① 从队列切出 [帧k, 帧k+1] 的 100 个样本</span><br><span class="line">                                    ② new Preintegrator(锁定的零偏)  ← 零偏在这冻结</span><br><span class="line">                                    ③ for 循环 100 次 push()          ← ★ 批量积分</span><br><span class="line">                                    ④ 得到 pre.p / v / q / J / C / S</span><br><span class="line">                                    ⑤ 这条「边」挂到窗口上</span><br><span class="line"></span><br><span class="line">【③ 优化流】每帧一次</span><br><span class="line">                                 │</span><br><span class="line">                                 └─► 窗口求解</span><br><span class="line">                                      用所有边的残差 → 估计【位姿 / 速度 / 零偏】</span><br><span class="line">                                                          ↑</span><br><span class="line">                                                    ★ 这才是「估计」！</span><br><span class="line">                                                    零偏在这里才被更新</span><br><span class="line">                                                          │</span><br><span class="line">                                                          └─► 下一帧建区间时，</span><br><span class="line">                                                              用新零偏当线性化点</span><br></pre></td></tr></table></figure>
+
+<div class="note info flat"><p><strong>容易误解的地方</strong>：「持续」的是 IMU 样本的<strong>缓存</strong>，不是积分本身。预积分是<strong>图像帧到达时一次性批量完成</strong>的，不是每来一个样本积一点。</p>
+</div>
+
+<h2 id="三、逐句核对：常见的五个误解"><a href="#三、逐句核对：常见的五个误解" class="headerlink" title="三、逐句核对：常见的五个误解"></a>三、逐句核对：常见的五个误解</h2><table>
+<thead>
+<tr>
+<th>常见说法</th>
+<th>判定</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>按滑动窗口有若干帧，任务是<strong>根据视觉+IMU 优化估计位姿</strong></td>
+<td>✅</td>
+<td>完全正确</td>
+</tr>
+<tr>
+<td>在两帧之间进行<strong>持续性</strong>的离散预积分</td>
+<td>⚠️</td>
+<td>持续的是样本<strong>缓存</strong>；积分是帧到达时<strong>批量</strong>做的</td>
+</tr>
+<tr>
+<td>预积分<strong>和估计</strong></td>
+<td>❌</td>
+<td><strong>预积分不含任何估计</strong></td>
+</tr>
+<tr>
+<td>预积分实现 <strong>IMU 零漂的动态估计</strong></td>
+<td>❌</td>
+<td><strong>零偏估计在窗口优化里</strong>，预积分只是「用」它并记录敏感度</td>
+</tr>
+<tr>
+<td>根据每次 push 进来的数据累加预积分数据，<strong>并估计偏差</strong></td>
+<td>❌</td>
+<td>累加正确；但只<strong>记录对偏差的敏感度</strong> $\mathbf J$，不估计</td>
+</tr>
+<tr>
+<td>移测量<strong>也满足某种分布</strong></td>
+<td>✅</td>
+<td><strong>直觉很准</strong>！这就是协方差 $\mathbf C$（见第七节）</td>
+</tr>
+<tr>
+<td>一个区间用完得到两帧之间的位姿变化，<strong>和画面信息一起参与整体状态估计</strong></td>
+<td>✅</td>
+<td><strong>这句完全正确，抓住了本质</strong></td>
+</tr>
+</tbody></table>
+<h2 id="四、预积分做的三件事（没有一件是「估计」）"><a href="#四、预积分做的三件事（没有一件是「估计」）" class="headerlink" title="四、预积分做的三件事（没有一件是「估计」）"></a>四、预积分做的三件事（没有一件是「估计」）</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Preintegrator::push</span><span class="params">(<span class="type">double</span> dt, <span class="type">const</span> V3&amp; a1, <span class="type">const</span> V3&amp; w1)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ① 积分标称状态（中值法）</span></span><br><span class="line">    p += v<em>dt + <span class="number">.5</span></em>a*dt*dt;</span><br><span class="line">    v += a*dt;</span><br><span class="line">    q  = qt.<span class="built_in">normalized</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ② 累积「对初始状态的敏感度」（雅可比）</span></span><br><span class="line">    J = F*J;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ③ 传播「不确定性」（协方差）</span></span><br><span class="line">    C = F*C*F.<span class="built_in">transpose</span>() + V*effective*V.<span class="built_in">transpose</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>做的东西</th>
+<th>输出</th>
+<th>是不是「估计」</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>① 积分</td>
+<td>$\Delta\mathbf p,\ \Delta\mathbf v,\ \Delta\mathbf R$</td>
+<td>❌ 纯数值计算</td>
+</tr>
+<tr>
+<td>② 敏感度累积</td>
+<td>$\mathbf J$（15×15）、$\mathbf S$（15×6）</td>
+<td>❌ 纯数值计算</td>
+</tr>
+<tr>
+<td>③ 不确定性传播</td>
+<td>$\mathbf C$（15×15）</td>
+<td>❌ 纯数值计算</td>
+</tr>
+</tbody></table>
+<h2 id="五、估计发生在哪里"><a href="#五、估计发生在哪里" class="headerlink" title="五、估计发生在哪里"></a>五、估计发生在哪里</h2><p>窗口求解是一个迭代循环，<strong>步骤 ④ 才是「估计」</strong>：</p>
+<ol>
+<li><strong>组装</strong>：每条边用 $\texttt{pre.p/v/q}$ 和 $\texttt{pre.J}$ 造出 15 维残差 $\mathbf r$ 和雅可比 $\mathbf J_r$</li>
+<li><strong>构造</strong>：$\mathbf H=\sum\mathbf J_r^\top\mathbf J_r$，$\mathbf b=\sum\mathbf J_r^\top\mathbf r$</li>
+<li><strong>求解</strong>：Dogleg 解出增量 $\Delta\mathcal X$（含位姿、速度、零偏）</li>
+<li><strong>更新</strong>：$\mathcal X\leftarrow\mathcal X+\Delta\mathcal X$ ← <strong>★ 零偏在这里才变！</strong></li>
+<li>回到步骤 1，继续迭代</li>
+</ol>
+<div class="note info flat"><p><strong>关键</strong>：步骤 ④ 零偏变了之后，<strong>预积分量并不重新算</strong> —— 靠 $\texttt{pre.J}$ 做一阶修正：<br>$\text{残差}=\text{旧零偏下的预积分量}+\mathbf J\cdot(\text{新零偏}-\text{旧零偏})-\text{状态推算}$</p>
+</div>
+
+<h2 id="六、零偏的特殊地位：建区间时锁定"><a href="#六、零偏的特殊地位：建区间时锁定" class="headerlink" title="六、零偏的特殊地位：建区间时锁定"></a>六、零偏的特殊地位：建区间时锁定</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/swf/imu_processor.h</span></span><br><span class="line"><span class="comment">// 区间预积分的线性化点：建区间时锁定，之后的偏置变化由预积分的一阶 Jacobian 补偿。</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">ImuLinearizationPoint</span> &#123;</span><br><span class="line">    V3D accel_bias = V3D::<span class="built_in">Zero</span>();</span><br><span class="line">    V3D gyro_bias  = V3D::<span class="built_in">Zero</span>();</span><br><span class="line">    V3D accel_scale = V3D::<span class="built_in">Ones</span>();</span><br><span class="line">    V3D gyro_scale  = V3D::<span class="built_in">Ones</span>();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>「建区间时锁定」</strong>这五个字就是答案：预积分时用的零偏是<strong>那一刻的估计值，冻结住</strong>，整个区间不再变。零偏会变，但那是在<strong>窗口优化</strong>里变的。</p>
+<h2 id="七、为什么预积分量「也满足某种分布」"><a href="#七、为什么预积分量「也满足某种分布」" class="headerlink" title="七、为什么预积分量「也满足某种分布」"></a>七、为什么预积分量「也满足某种分布」</h2><p>这是一个很好的直觉。预积分量确实服从高斯分布：</p>
+<p>$$\Delta\mathbf p_{ij}\sim\mathcal N\big(\hat{\Delta\mathbf p}_{ij},\ \mathbf C_{\Delta p}\big)$$</p>
+<p>但这个分布不是「自然就有」的，是<strong>算出来的</strong> —— 通过误差传播：</p>
+<p>$$\mathbf C_{k+1}=\underbrace{\mathbf F_k\mathbf C_k\mathbf F_k^\top}_{\text{旧不确定性被搬过去}}+\underbrace{\mathbf V_k\mathbf Q_k\mathbf V_k^\top}_{\text{这一步新注入的噪声}}$$</p>
+<div class="note warning flat"><p><strong>注意</strong>：协方差 $\mathbf C$ 是由 <strong>状态转移矩阵</strong> $\mathbf F$ <strong>和噪声映射</strong> $\mathbf V$ 决定的，<strong>不是</strong>由「对偏差的雅可比 $\mathbf J$」决定的。<br>$\mathbf F$ 和 $\mathbf J$ 是<strong>同一个矩阵的两种用途</strong>：$\mathbf F$ 单步传播协方差，$\mathbf J$ 连乘累积敏感度（$\mathbf J_N=\mathbf F_{N-1}\cdots\mathbf F_0$）。</p>
+</div>
+
+<p>最后 $\mathbf C$ 变成白化矩阵：</p>
+<p>$$\texttt{sqrt\_info}=\mathbf C^{-1/2},\qquad \mathbf r_{\text{白化}}=\mathbf C^{-1/2}\mathbf r$$</p>
+<p>含义：「这个预积分量不确定性大，那它说的话就别太当真。」</p>
+<h2 id="八、预积分产出清单"><a href="#八、预积分产出清单" class="headerlink" title="八、预积分产出清单"></a>八、预积分产出清单</h2><table>
+<thead>
+<tr>
+<th>变量</th>
+<th>类型</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\texttt{p, v, q}$</td>
+<td>3+3+4</td>
+<td>三个预积分量，残差的「预测值」</td>
+</tr>
+<tr>
+<td>$\texttt{duration}$</td>
+<td>标量</td>
+<td>区间时长，重力项和时延项要用</td>
+</tr>
+<tr>
+<td>$\texttt{J}$</td>
+<td>15×15</td>
+<td>对初始误差状态的敏感度 → <strong>零偏一阶修正 + 残差雅可比的原料</strong></td>
+</tr>
+<tr>
+<td>$\texttt{S}$</td>
+<td>15×6</td>
+<td>对刻度 $[\mathbf s_a,\mathbf s_g]$ 的敏感度</td>
+</tr>
+<tr>
+<td>$\texttt{C}$</td>
+<td>15×15</td>
+<td>协方差 → <strong>白化矩阵</strong></td>
+</tr>
+<tr>
+<td>$\texttt{gyro\_first/last}$</td>
+<td>3+3</td>
+<td>区间两端角速度 → 时延修正</td>
+</tr>
+<tr>
+<td>$\texttt{acc\_prev/gyro\_prev}$</td>
+<td>3+3</td>
+<td>上一个样本 → 下一步中点法</td>
+</tr>
+</tbody></table>
+<h2 id="九、代码对照"><a href="#九、代码对照" class="headerlink" title="九、代码对照"></a>九、代码对照</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ① 缓存：什么都不算</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">IMUProcessor::pushSample</span><span class="params">(<span class="type">const</span> ImuSample &amp;sample)</span> </span>&#123;</span><br><span class="line">    pending.<span class="built_in">push_back</span>(sample);          <span class="comment">// 只是入队</span></span><br><span class="line">    prediction.<span class="built_in">push_back</span>(sample);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ② 图像帧到达：一次性批量积分</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">IMUProcessor::appendFrame</span><span class="params">(<span class="type">double</span> image_time, <span class="type">const</span> ImuLinearizationPoint &amp;point)</span> </span>&#123;</span><br><span class="line">    std::vector&lt;ImuSample&gt; samples;</span><br><span class="line">    <span class="built_in">extractSamples</span>(frame_times.<span class="built_in">back</span>(), image_time, samples);   <span class="comment">// 切出区间</span></span><br><span class="line"></span><br><span class="line">    interval.preintegrator = std::<span class="built_in">make_unique</span>&lt;Preintegrator&gt;(</span><br><span class="line">        samples.<span class="built_in">front</span>().accel, samples.<span class="built_in">front</span>().gyro,</span><br><span class="line">        point.accel_bias, point.gyro_bias,        <span class="comment">// 用「锁定的」零偏</span></span><br><span class="line">        point.accel_scale, point.gyro_scale, noise);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (std::<span class="type">size_t</span> i = <span class="number">1</span>; i &lt; samples.<span class="built_in">size</span>(); ++i) &#123;          <span class="comment">// 批量循环</span></span><br><span class="line">        <span class="type">const</span> <span class="type">double</span> dt = samples[i].timestamp - samples[i<span class="number">-1</span>].timestamp;</span><br><span class="line">        interval.preintegrator-&gt;<span class="built_in">push</span>(dt, samples[i].accel, samples[i].gyro);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、三个-takeaway"><a href="#十、三个-takeaway" class="headerlink" title="十、三个 takeaway"></a>十、三个 takeaway</h2><ol>
+<li><strong>预积分是「算」，不是「估」。</strong>它是把 100 个 IMU 样本压缩成一个约束的纯数值过程。零偏在预积分阶段是<strong>冻结</strong>的，只是被记录下敏感度。</li>
+<li><strong>「持续」的是样本缓存，不是积分。</strong>$\texttt{pushSample}$ 只入队；真正的积分发生在图像帧到达、$\texttt{appendFrame}$ 被调用时，一次性批量完成。</li>
+<li><strong>估计在窗口层。</strong>零偏、速度、位姿都在那里被解出来；零偏更新后<strong>不重新积分</strong> —— 靠 $\texttt{pre.J}$ 做一阶修正。这就是「预」积分能成立的前提，也是雅可比矩阵存在的理由。</li>
+</ol>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/github-profile.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harekasa</div><div class="author-info-description">Harekasa的个人博客，分享技术、生活和兴趣爱好。</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">40</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/andyyang12345"><i class="fab fa-github"></i><span>OMG its me  !</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/AndyYang12345" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:eeysy_harekasa@mail.scut.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/physics-lab-report-agent-skill/" title="把大学物理实验报告做成 Agent Skill">把大学物理实验报告做成 Agent Skill</a><time datetime="2026-09-18T12:11:29.000Z" title="Created 2026-09-18 20:11:29">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/drcom-and-syslog/" title="校园网 Dr.COM 客户端部署与 11 GB syslog 治理">校园网 Dr.COM 客户端部署与 11 GB syslog 治理</a><time datetime="2026-09-18T12:11:26.000Z" title="Created 2026-09-18 20:11:26">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/dsh-butler-memory/" title="给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory">给 DSH 造一份长期记忆：butler-memory-mcp 与 dsh-butler-memory</a><time datetime="2026-09-18T12:11:23.000Z" title="Created 2026-09-18 20:11:23">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/ball-balancing-robot/" title="记2026年电赛H题：车载平衡滚球系统">记2026年电赛H题：车载平衡滚球系统</a><time datetime="2026-09-18T12:11:22.000Z" title="Created 2026-09-18 20:11:22">2026-09-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/xorg-wayland-shortcuts/" title="关于xorg下wayland快捷操作的简单平替">关于xorg下wayland快捷操作的简单平替</a><time datetime="2026-08-06T07:13:52.000Z" title="Created 2026-08-06 15:13:52">2026-08-06</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/ai-tools/"><span class="card-category-list-name">AI工具</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/backend/"><span class="card-category-list-name">后端</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/embedded-development/"><span class="card-category-list-name">嵌入式开发</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/robotics/"><span class="card-category-list-name">机器人</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/operations/"><span class="card-category-list-name">运维</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/open-source/" style="font-size: 1.1em; color: #999">开源</a> <a href="/tags/environment-setup/" style="font-size: 1.1em; color: #999">环境部署</a> <a href="/tags/MaixCAM2/" style="font-size: 1.1em; color: #999">MaixCAM2</a> <a href="/tags/PostgreSQL/" style="font-size: 1.1em; color: #999">PostgreSQL</a> <a href="/tags/Ubuntu/" style="font-size: 1.1em; color: #999">Ubuntu</a> <a href="/tags/automation/" style="font-size: 1.1em; color: #999">自动化</a> <a href="/tags/OpenOCD/" style="font-size: 1.1em; color: #999">OpenOCD</a> <a href="/tags/systemd/" style="font-size: 1.1em; color: #999">systemd</a> <a href="/tags/DapLink/" style="font-size: 1.1em; color: #999">DapLink</a> <a href="/tags/campus-network/" style="font-size: 1.1em; color: #999">校园网</a> <a href="/tags/Codex/" style="font-size: 1.1em; color: #999">Codex</a> <a href="/tags/Agent-Skill/" style="font-size: 1.5em; color: #99a9bf">Agent Skill</a> <a href="/tags/SysConfig/" style="font-size: 1.1em; color: #999">SysConfig</a> <a href="/tags/STM32/" style="font-size: 1.1em; color: #999">STM32</a> <a href="/tags/TI/" style="font-size: 1.1em; color: #999">TI</a> <a href="/tags/docx/" style="font-size: 1.1em; color: #999">docx</a> <a href="/tags/AI/" style="font-size: 1.1em; color: #999">AI</a> <a href="/tags/CMake/" style="font-size: 1.1em; color: #999">CMake</a> <a href="/tags/embedded-vision/" style="font-size: 1.1em; color: #999">嵌入式视觉</a> <a href="/tags/DSH/" style="font-size: 1.1em; color: #999">DSH</a> <a href="/tags/VSCode/" style="font-size: 1.5em; color: #99a9bf">VSCode</a> <a href="/tags/Wayland/" style="font-size: 1.1em; color: #999">Wayland</a> <a href="/tags/machine-vision/" style="font-size: 1.1em; color: #999">机器视觉</a> <a href="/tags/MSPM0/" style="font-size: 1.1em; color: #999">MSPM0</a> <a href="/tags/rsyslog/" style="font-size: 1.1em; color: #999">rsyslog</a> <a href="/tags/GPT-SoVits/" style="font-size: 1.1em; color: #999">GPT-SoVits</a> <a href="/tags/Xorg/" style="font-size: 1.1em; color: #999">Xorg</a> <a href="/tags/physics-lab/" style="font-size: 1.1em; color: #999">物理实验</a> <a href="/tags/electronics-competition/" style="font-size: 1.1em; color: #999">电赛</a> <a href="/tags/plugin-development/" style="font-size: 1.1em; color: #999">插件开发</a> <a href="/tags/YOLO/" style="font-size: 1.1em; color: #999">YOLO</a> <a href="/tags/log-management/" style="font-size: 1.1em; color: #999">日志治理</a> <a href="/tags/embedded/" style="font-size: 1.1em; color: #999">嵌入式</a> <a href="/tags/embedded-development/" style="font-size: 1.1em; color: #999">嵌入式开发</a> <a href="/tags/GNOME/" style="font-size: 1.1em; color: #999">GNOME</a> <a href="/tags/MCP/" style="font-size: 1.1em; color: #999">MCP</a> <a href="/tags/long-term-memory/" style="font-size: 1.1em; color: #999">长期记忆</a> <a href="/tags/Python/" style="font-size: 1.1em; color: #999">Python</a> <a href="/tags/server-setup/" style="font-size: 1.1em; color: #999">服务器搭建</a> <a href="/tags/Linux/" style="font-size: 1.5em; color: #99a9bf">Linux</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/09/">
+            <span class="card-archive-list-date">
+              September 2026
+            </span>
+            <span class="card-archive-list-count">4</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/08/">
+            <span class="card-archive-list-date">
+              August 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/07/">
+            <span class="card-archive-list-date">
+              July 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/05/">
+            <span class="card-archive-list-date">
+              May 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/04/">
+            <span class="card-archive-list-date">
+              April 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">11</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">34.7k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-10-10T14:42:21.296Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/top_image.jpg);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harekasa</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div><div class="footer_custom_text">我始终如一 ~</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="translateLink" type="button" title="Toggle Between Traditional and Simplified Chinese">繁</button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="/js/tw_cn.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script src="/js/TabName.js"></script><script src="/js/tag-colorizer.js"></script><script type="module" src="/js/three-hero.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="80" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-nest.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="搜索文章与知识库笔记" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>
