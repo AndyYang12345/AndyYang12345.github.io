@@ -1,0 +1,14 @@
+{
+  "source_video": "video_🥳kkr：⚡️_朋友的酒🍺D..._0.mp4",
+  "source_sha256": "3cb3bc326d544128abb9f988675f8284a1f6c22b9315551839d84b449f88b906",
+  "output": "friends-wine.m4a",
+  "output_sha256": "4722e34ffeddce9d8c7ee3bbc53da9138c197d66cbf78b862a2bc380ce548f66",
+  "bytes": 2322529,
+  "duration_seconds": 187.37,
+  "audio_codec": "AAC",
+  "bitrate": "96k",
+  "filters": "afade=t=in:st=0:d=0.35,afade=t=out:st=185.3:d=2",
+  "default_music": "off",
+  "loop": true,
+  "source": "User supplied video, extracted locally with ffmpeg; no external music service."
+}

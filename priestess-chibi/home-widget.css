@@ -1,0 +1,39 @@
+#priestess-chibi-home{position:fixed;left:12px;bottom:12px;width:220px;z-index:98;display:flex;flex-direction:column;align-items:center;pointer-events:none;font-family:system-ui,-apple-system,"Noto Sans SC",sans-serif;color:#51415f}
+#priestess-chibi-home>iframe{width:100%;height:262px;border:0;pointer-events:auto;background:transparent}
+#priestess-chibi-home .prts-toolbar{display:flex;gap:4px;white-space:nowrap;align-items:center;pointer-events:auto}
+#priestess-chibi-home button{border:1px solid #cfc1da;border-radius:18px;background:#fffdf4ee;color:#71537e;font:11px/1.8 system-ui,sans-serif;padding:4px 9px;cursor:pointer;box-shadow:0 2px 8px #0001;transition:background .15s}
+#priestess-chibi-home button:hover,#priestess-chibi-home button.active,#prts-music[aria-pressed=true]{background:#e5d6ee}
+#priestess-chibi-home :is(button,input,select,summary):focus-visible{outline:2px solid #a87cbe;outline-offset:3px}
+#priestess-chibi-home [hidden]{display:none!important}
+#priestess-chibi-home .prts-panel{position:absolute;bottom:0;left:calc(100% + 12px);width:320px;max-height:min(78dvh,690px);overflow:auto;overscroll-behavior:contain;pointer-events:auto;background:#fffaf4f5;border:1px solid #d6c4dc;border-radius:21px;box-shadow:0 15px 60px #15082455;backdrop-filter:blur(18px);text-align:left;font-size:12px;line-height:1.55;scrollbar-width:thin;scrollbar-color:#c5b0d1 transparent;color-scheme:light}
+#priestess-chibi-home .prts-panel-title{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:18px 19px 12px;border-bottom:1px solid #e5d9e8;background:#fffaf4}
+#priestess-chibi-home .prts-panel :is(input,select){scroll-margin-block:80px}
+#priestess-chibi-home .prts-panel-title small{display:block;font-size:8px;letter-spacing:2px;color:#a58dae}
+#priestess-chibi-home .prts-panel-title strong{display:block;font-size:17px;font-weight:600;letter-spacing:1px;margin-top:3px}
+#priestess-chibi-home #prts-close{font-size:20px;padding:0 10px;box-shadow:none;background:transparent;border-color:transparent}
+#priestess-chibi-home .prts-section{padding:8px 19px 10px}
+#priestess-chibi-home .prts-switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;cursor:pointer}
+#priestess-chibi-home .prts-switch small{display:block;font-size:10px;color:#a08aac;line-height:1.5;margin-top:2px}
+#priestess-chibi-home .prts-switch input{appearance:none;flex:0 0 32px;width:32px;height:19px;background:#d9d1dd;border:0;border-radius:15px;position:relative;cursor:pointer;margin:0;transition:background .15s}
+#priestess-chibi-home .prts-switch input:before{content:"";position:absolute;width:13px;height:13px;top:3px;left:3px;border-radius:50%;background:white;box-shadow:0 1px 3px #0002;transition:transform .15s}
+#priestess-chibi-home .prts-switch input:checked{background:#9975ad}
+#priestess-chibi-home .prts-switch input:checked:before{transform:translateX(13px)}
+#priestess-chibi-home .prts-slider{display:block;padding:8px 0 7px}
+#priestess-chibi-home .prts-slider>span{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#priestess-chibi-home output{font-size:10px;color:#9a76ac;font-variant-numeric:tabular-nums}
+#priestess-chibi-home input[type=range]{width:100%;accent-color:#9b73af;display:block;margin:8px 0 0;cursor:pointer;height:17px;padding:0}
+#priestess-chibi-home .prts-slider>small{font-size:9px;color:#b19abc}
+#priestess-chibi-home .prts-more{padding:15px 19px;background:#eee4f3;border-top:1px solid #e5d9e8;border-bottom:1px solid #e5d9e8;font-weight:600}
+#priestess-chibi-home .prts-more small{font-weight:400}
+#priestess-chibi-home .prts-more-options{padding:4px 19px 12px}
+#priestess-chibi-home summary{cursor:pointer;color:#92709f;font-size:11px;padding:10px 0}
+#priestess-chibi-home .prts-select{display:flex;align-items:center;justify-content:space-between;padding:9px 0}
+#priestess-chibi-home select{max-width:155px;border:1px solid #d9cadd;border-radius:8px;padding:6px 8px;font:11px system-ui;background:#f5edf8;color:#6e507c}
+#priestess-chibi-home .prts-panel footer{display:flex;align-items:center;gap:10px;padding:12px 19px 17px;border-top:1px solid #e5d9e8}
+#priestess-chibi-home #prts-reset{flex-shrink:0;font-size:10px;background:transparent;box-shadow:none}
+#priestess-chibi-home #prts-notice{font-size:10px;color:#a28bae}
+#priestess-chibi-swarm{position:absolute;inset:64px 0 36px;width:100%;height:calc(100% - 100px);border:0;background:transparent;pointer-events:none;z-index:1}
+#page-header:has(#priestess-chibi-swarm) #site-info{z-index:2}
+#page-header:has(#priestess-chibi-swarm) #scroll-down{z-index:2}
+@media(max-width:768px){#priestess-chibi-home{left:7px;bottom:7px;width:180px}#priestess-chibi-home>iframe{height:210px}#priestess-chibi-home button{font-size:10px;padding:4px 7px}#priestess-chibi-home .prts-panel{left:0;bottom:43px;width:min(320px,calc(100vw - 14px));max-height:72dvh}}
+@media(prefers-reduced-motion:reduce){#priestess-chibi-home :is(button,input),#priestess-chibi-home .prts-switch input:before{transition:none}}

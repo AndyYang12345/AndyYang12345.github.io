@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>更多小普 · 太空漂浮</title>
+  <style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}canvas{display:block;width:100%;height:100%}#swarm-status{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font:12px system-ui;color:#e5d8f1;background:#21152bcc;padding:6px 12px;border-radius:16px}#swarm-status:empty{display:none}</style>
+  <script type="importmap">{"imports":{"three":"./vendor/three-r170/build/three.module.js","three/addons/":"./vendor/three-r170/examples/jsm/"}}</script>
+</head>
+<body>
+  <canvas id="swarm" role="img" aria-label="在头图太空中旋转、弹跳的小普群"></canvas>
+  <span id="swarm-status" role="status">小普正在集合…</span>
+  <script type="module" src="./swarm.js?v=003"></script>
+</body>
+</html>
