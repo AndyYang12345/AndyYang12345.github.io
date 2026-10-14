@@ -22,5 +22,11 @@
     "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/LICENSE",
     "bytes": 1081,
     "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+  },
+  {
+    "file": "examples/jsm/utils/SkeletonUtils.js",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/utils/SkeletonUtils.js",
+    "bytes": 8802,
+    "sha256": "ee412be1aa05f3051c2bda8ea89612c1ba70c5c87de62b56040282120d5eb991"
   }
 ]

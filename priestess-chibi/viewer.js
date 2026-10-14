@@ -2,17 +2,36 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import {springStep, kick} from './physics.js?v=003';
 
+import {attachEarMotion} from './ear-motion.js?v=004';
+import {characters as profiles, characterKey} from './characters.js?v=004';
+
 const $ = id => document.getElementById(id);
 const canvas = $('character');
 const stage = $('stage');
 const params = new URLSearchParams(location.search);
 const preference = matchMedia('(prefers-reduced-motion: reduce)');
-const sourceURL = new URL('./assets/priestess-seated-v002.glb', import.meta.url);
+const character = characterKey(params.get('character'));
+const profile = profiles[character];
+const sourceURL = new URL('./assets/' + profile.file, import.meta.url);
+let earMotion = null;
+$('character-select').value = character;
+$('character-name').textContent = profile.name;
+$('poster').src = new URL('./assets/' + profile.poster, import.meta.url).href;
+$('poster').alt = profile.name + '静态预览';
+canvas.setAttribute('aria-label',profile.name+'三维手办；拖动旋转，点击轻弹');
+$('ear-controls').hidden = character !== 'amiya';
+$('model-spec').textContent = `${profile.triangles.toLocaleString()} 三角面 · 带颜色 GLB`;
+$('model-note').textContent = character === 'amiya' ? '下降时耳朵收起，上升时轻轻向两侧摆。也可以切换固定耳姿观察。' : '普通刘海、浅拱眉和白色背部实验服，保留了开心的笑脸。';
+const hop = () => state.elastic ? .115 * (1-Math.cos(state.time * 4*Math.PI)) / 2
+  + (!state.playing && state.clickTime >= 0 ? .115 * (1-Math.cos(state.clickTime * 4*Math.PI)) / 2 : 0) : 0;
+const verticalVelocity = () => state.elastic ? state.playing
+  ? .115 * 2*Math.PI * Math.sin(state.time * 4*Math.PI)
+  : state.clickTime >= 0 ? .115 * 2*Math.PI * Math.sin(state.clickTime * 4*Math.PI) : 0 : 0;
 const state = {
   playing: !preference.matches && !params.has('paused'),
   elastic: true, period: 2.7, strength: 1.15, yaw: THREE.MathUtils.degToRad(Number(params.get('angle')) || 0),
-  time: 0, squash: 0, sv: 0, pulse: -1, bumpUntil: 0, visible: true, hostVisible: true,
-  dragging: false, ready: false, destroyed: false, raf: 0, last: 0,
+  time: 0, clickTime:-1, squash: 0, sv: 0, pulse: -1, bumpUntil: 0, visible: true, hostVisible: true,
+  earsEnabled:true, earStrength:1, dragging: false, ready: false, destroyed: false, raf: 0, last: 0,
 };
 let renderer, scene, camera, spin, deform, shadow, resizeObserver, intersectionObserver;
 const cleanup = [];
@@ -38,7 +57,8 @@ function render() {
   const yScale = 1 + state.squash;
   const widthScale = 1 / Math.sqrt(yScale);
   deform.scale.set(widthScale, yScale, widthScale);
-  deform.position.y = Math.max(0, state.squash) * .65;
+  deform.position.y = hop();
+  earMotion?.apply(widthScale,yScale);
   spin.rotation.z = state.squash * .06;
   shadow.scale.setScalar(1 + Math.max(0, -state.squash) * .6);
   renderer.render(scene, camera);
@@ -48,6 +68,15 @@ function render() {
   canvas.dataset.playing = String(state.playing);
   canvas.dataset.period = String(state.period);
   canvas.dataset.strength = String(state.strength);
+  canvas.dataset.character = character;
+  canvas.dataset.verticalVelocity = verticalVelocity().toFixed(4);
+  canvas.dataset.hop = hop().toFixed(4);
+  if (earMotion) {
+    canvas.dataset.earAngle = earMotion.state.angle.toFixed(3);
+    canvas.dataset.earTipAngle = earMotion.state.tip.toFixed(3);
+    canvas.dataset.earLengthRatios = earMotion.lengthRatios().map(x=>x.toFixed(6)).join(',');
+    canvas.dataset.earMode = $('ear-pose').value;
+  }
 }
 function canAnimate() {
   return state.ready && !state.destroyed && state.visible && state.hostVisible && !document.hidden
@@ -62,6 +91,10 @@ function tick(now) {
     state.time += dt;
     if (!state.dragging) state.yaw += dt * 2 * Math.PI / state.period;
   }
+  else if (state.clickTime >= 0) {
+    state.clickTime += dt;
+    if (state.clickTime >= .5) state.clickTime = -1;
+  }
   // A squeeze impulse followed by an underdamped spring gives a visible stretch and rebound.
   const pulse = Math.floor(state.time * 2);
   if (pulse !== state.pulse) {
@@ -73,6 +106,7 @@ function tick(now) {
   for (let i = 0; i < steps; i++) {
     springStep(state, h, state.strength);
   }
+  earMotion?.step(dt,verticalVelocity(),state.earsEnabled ? $('ear-pose').value : 'rest',state.earStrength);
   render();
   if (canAnimate()) state.raf = requestAnimationFrame(tick);
 }
@@ -84,6 +118,7 @@ function bounce() {
   if (!state.ready) return;
   // A direct click is an explicit request for this brief motion, even when idle is paused.
   kick(state, state.strength, 1.3);
+  state.clickTime = 0;
   state.bumpUntil = performance.now() + 1800;
   schedule();
 }
@@ -154,6 +189,10 @@ async function init() {
   gltf.scene.scale.multiplyScalar(scale);
   gltf.scene.position.add(new THREE.Vector3(-center.x * scale, -bounds.min.y * scale, -center.z * scale));
   deform.add(gltf.scene);
+  gltf.scene.updateWorldMatrix(true,true);
+  earMotion = character === 'amiya' ? attachEarMotion(gltf.scene) : null;
+  if (character === 'amiya' && !earMotion) throw new Error('Missing independent ear bones');
+  canvas.dataset.skinnedMeshCount = String(gltf.scene.getObjectsByProperty('isSkinnedMesh',true).length);
   gltf.scene.traverse(o => {
     if (!o.isMesh) return;
     for (const m of (Array.isArray(o.material) ? o.material : [o.material])) {
@@ -173,6 +212,14 @@ async function init() {
   if (parent !== window) parent.postMessage({type:'priestess-viewer-ready'},location.origin);
 }
 
+listen($('character-select'),'change',e=>{
+  const url = new URL(location.href); url.searchParams.set('character',e.target.value); location.href = url.href;
+});
+listen($('ears-enabled'),'change',e=>{state.earsEnabled=e.target.checked; if (!state.earsEnabled) earMotion?.setPose('rest'); render();});
+listen($('ear-pose'),'change',e=>{
+  earMotion?.setPose(e.target.value === 'follow' ? 'rest' : e.target.value); render();
+});
+listen($('ear-strength'),'input',e=>{state.earStrength=Number(e.target.value); $('ear-strength-value').value=state.earStrength.toFixed(2)+' 倍';});
 listen($('play'), 'click', () => { state.playing = !state.playing; state.bumpUntil = 0; syncControls(); schedule(); });
 listen($('bounce'), 'click', bounce);
 listen($('speed'), 'input', e => { state.period = Number(e.target.value); syncControls(); render(); });
@@ -219,6 +266,8 @@ listen(window, 'message', e => {
     for (const key of ['playing','elastic']) if (typeof config[key] === 'boolean') state[key] = config[key];
     if (Number.isFinite(config.period)) state.period = THREE.MathUtils.clamp(config.period,.8,12);
     if (Number.isFinite(config.strength)) state.strength = THREE.MathUtils.clamp(config.strength,.3,1.8);
+    if (typeof config.earsEnabled === 'boolean') {state.earsEnabled=config.earsEnabled; $('ears-enabled').checked=state.earsEnabled; if (!state.earsEnabled) earMotion?.setPose('rest');}
+    if (Number.isFinite(config.earStrength)) {state.earStrength=THREE.MathUtils.clamp(config.earStrength,0,1.5); $('ear-strength').value=String(state.earStrength); $('ear-strength-value').value=state.earStrength.toFixed(2)+' 倍';}
     if (!state.elastic) state.squash = state.sv = 0;
     syncControls(); render(); schedule();
   }
@@ -237,7 +286,7 @@ listen($('reference-toggle'), 'click', () => {
   $('reference-toggle').setAttribute('aria-expanded', String(show));
 });
 init().catch(error => {
-  console.error('[Priestess]', error);
+  console.error('[Chibi companions]', error);
   $('status').textContent = '暂时无法显示三维手办，先看看静态预览。';
   $('poster').hidden = false; canvas.hidden = true; dispose();
 });

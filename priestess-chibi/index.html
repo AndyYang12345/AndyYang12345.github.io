@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>普瑞赛斯 · 坐姿小手办</title>
-  <link rel="stylesheet" href="./style.css?v=003">
+  <title>小小同行者 · 坐姿预览</title>
+  <link rel="stylesheet" href="./style.css?v=004">
   <script>if(new URLSearchParams(location.search).has('embed'))document.documentElement.classList.add('embedded');</script>
   <script type="importmap">{"imports":{"three":"./vendor/three-r170/build/three.module.js","three/addons/":"./vendor/three-r170/examples/jsm/"}}</script>
 </head>
 <body>
   <main>
-    <header class="page-heading"><div class="eyebrow">PRIESTESS / LITTLE COMPANION</div><h1>坐在这里，陪你一会儿。</h1><p>转个圈，轻轻弹一下。</p></header>
+    <header class="page-heading"><div class="eyebrow">LITTLE COMPANIONS</div><h1>小小同行者，坐在这里。</h1><p>转个圈，轻轻弹一下。</p></header>
     <div class="layout">
-      <section class="viewer-card" aria-label="普瑞赛斯三维预览">
-        <div class="card-top"><span>普瑞赛斯</span><span class="badge">坐姿小手办</span></div>
+      <section class="viewer-card" aria-label="同行者三维预览">
+        <label class="setting-row character-picker" style="padding:12px 20px">选择角色 <select id="character-select" aria-label="选择角色"><option value="smile">笑小普</option><option value="amiya">阿米娅</option><option value="original">泪眼小普</option></select></label><div class="card-top"><span id="character-name">笑小普</span><span class="badge">坐姿小手办</span></div>
         <div class="stage" id="stage">
-          <img id="poster" src="./assets/poster.png" alt="普瑞赛斯坐姿手办的静态预览">
-          <canvas id="character" tabindex="0" role="img" aria-label="可交互的普瑞赛斯三维手办；拖动旋转，点击或按回车轻弹"></canvas>
+          <img id="poster" src="./assets/priestess-smile-poster.png" alt="同行者坐姿手办的静态预览">
+          <canvas id="character" tabindex="0" role="img" aria-label="可交互的同行者三维手办；拖动旋转，点击或按回车轻弹"></canvas>
           <p id="status" role="status" aria-live="polite">正在唤醒小手办…</p>
         </div>
         <div class="controls">
@@ -27,17 +27,20 @@
           <label class="setting-row">旋转一圈 <output id="speed-value">2.7 秒</output><input id="speed" type="range" min="0.8" max="12" step="0.1" value="2.7" aria-label="旋转一圈秒数"></label>
           <label class="setting-row">Q弹强度 <output id="strength-value">1.15 倍</output><input id="strength" type="range" min="0.3" max="1.8" step="0.05" value="1.15" aria-label="Q弹强度"></label>
           <label class="setting-row"><input id="elastic" type="checkbox" checked> Q弹形变</label>
-        </details>
+        <div id="ear-controls" hidden><label class="setting-row"><input id="ears-enabled" type="checkbox" checked> 耳朵弹动</label>
+          <label class="setting-row">耳朵姿态 <select id="ear-pose" aria-label="耳朵姿态"><option value="follow">跟随弹跳</option><option value="rest">自然竖耳</option><option value="down">下落竖耳</option><option value="up">上弹摆耳</option></select></label>
+          <label class="setting-row">耳朵摆幅 <output id="ear-strength-value">1.00 倍</output><input id="ear-strength" type="range" min="0" max="1.5" step="0.05" value="1" aria-label="耳朵摆幅"></label>
+          </div></details>
         <div class="view-controls" aria-label="固定观察角度"><button data-angle="0">正面</button><button data-angle="90">侧面</button><button data-angle="180">背面</button><output id="angle" aria-label="当前朝向">0°</output></div>
         <p class="hint">拖动转身 · 点击轻弹 · 固定视角会暂停动画</p>
       </section>
       <aside>
         <section class="reference-card"><div class="eyebrow">MOTION REFERENCE</div><h2>同一个坐姿，更多一点弹性。</h2><button id="reference-toggle" class="reference-toggle" type="button" aria-expanded="false">播放阿米娅动作参考</button><img id="reference" width="280" height="280" hidden alt="阿米娅坐姿旋转动作参考"><p>默认 2.7 秒一圈，挤压后拉伸回弹。展开设置可以调整速度和 Q弹强度。</p></section>
-        <section class="note-card"><div class="eyebrow">CURRENT VERSION</div><h2>旋转，停下，再轻弹。</h2><p>头发、白实验服和小表情已经接上颜色。可以停在正面、侧面或背面，看看这个小小的坐姿。</p><p class="spec">21,984 三角面 · 2.78 MB GLB<br>内嵌配色贴图 · 页面动画</p></section>
+        <section class="note-card"><div class="eyebrow">CURRENT VERSION</div><h2>旋转，停下，再轻弹。</h2><p id="model-note"></p><p class="spec" id="model-spec"></p></section>
       </aside>
     </div>
-    <footer>坐姿小手办 / 本地预览 v003</footer>
+    <footer>小小同行者 / 坐姿预览 v004</footer>
   </main>
-  <script type="module" src="./viewer.js?v=003"></script>
+  <script type="module" src="./viewer.js?v=004"></script>
 </body>
 </html>

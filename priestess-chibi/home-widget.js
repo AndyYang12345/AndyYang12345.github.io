@@ -5,7 +5,8 @@
   const rootURL = new URL('./', document.currentScript?.src || location.href);
   const visibleKey = 'priestess-chibi-visible', settingsKey = 'priestess-chibi-settings-v3';
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const defaults = {playing:!reduced.matches, elastic:true, period:2.7, strength:1.15,
+  const labels={smile:'笑小普',amiya:'阿米娅',original:'泪眼小普'};
+  const defaults = {character:'smile',earsEnabled:true,earStrength:1,playing:!reduced.matches, elastic:true, period:2.7, strength:1.15,
     more:false, count:12, size:1, speed:1, motion:'bounce', edges:true, collide:false,
     restitution:.94, volume:.45};
   let config = {...defaults}, holder, frame, swarm, frameObserver, swarmObserver, audio;
@@ -13,9 +14,10 @@
   const clamp = (v, lo, hi, fallback) => Number.isFinite(Number(v)) ? Math.max(lo,Math.min(hi,Number(v))) : fallback;
   function sanitize(value) {
     if (!value || typeof value !== 'object') return;
-    for (const k of ['playing','elastic','more','edges','collide']) if (typeof value[k]==='boolean') config[k]=value[k];
-    for (const [k,lo,hi] of [['period',.8,12],['strength',.3,1.8],['count',2,36],['size',.5,1.8],['speed',.2,3],['restitution',.5,1],['volume',0,1]]) config[k]=clamp(value[k],lo,hi,config[k]);
+    for (const k of ['playing','elastic','more','edges','collide','earsEnabled']) if (typeof value[k]==='boolean') config[k]=value[k];
+    for (const [k,lo,hi] of [['earStrength',0,1.5],['period',.8,12],['strength',.3,1.8],['count',2,36],['size',.5,1.8],['speed',.2,3],['restitution',.5,1],['volume',0,1]]) config[k]=clamp(value[k],lo,hi,config[k]);
     config.count=Math.round(config.count);
+    if (Object.hasOwn(labels,value.character)) config.character=value.character;
     if (['bounce','drift','still'].includes(value.motion)) config.motion=value.motion;
   }
   try {sanitize(JSON.parse(localStorage.getItem(settingsKey)));} catch { /* Optional preferences. */ }
@@ -29,8 +31,8 @@
   }
   function ui() {
     if (!holder) return;
-    for (const k of ['playing','elastic','more','edges','collide']) $(k).checked=config[k];
-    for (const k of ['period','strength','count','size','speed','restitution','volume']) $(k).value=String(config[k]);
+    for (const k of ['playing','elastic','more','edges','collide','earsEnabled']) $(k).checked=config[k];
+    for (const k of ['period','strength','count','size','speed','restitution','volume','earStrength']) $(k).value=String(config[k]);
     $('period-value').value=`${config.period.toFixed(1)} 秒 / 圈`;
     $('strength-value').value=`${config.strength.toFixed(2)} 倍`;
     $('count-value').value=`${config.count} 只`;
@@ -39,12 +41,24 @@
     $('restitution-value').value=`${Math.round(config.restitution*100)}%`;
     $('volume-value').value=`${Math.round(config.volume*100)}%`;
     $('motion').value=config.motion;
+    $('character').value=config.character;
+    $('ear-options').hidden=config.character!=='amiya';
+    $('earStrength-value').value=`${config.earStrength.toFixed(2)} 倍`;
+    $('visible').textContent=`${labels[config.character]} · ${frame ? '收起' : '展开'}`;
+    holder.dataset.character=config.character;
     $('more-options').hidden=!config.more;
     $('music').textContent=musicOn ? '♫ 音乐开' : '♫ 音乐关';
     $('music').setAttribute('aria-pressed',String(musicOn));
     holder.dataset.music=String(musicOn); holder.dataset.more=String(config.more);
   }
-  function setConfig(values) {sanitize(values); persist(); ui(); syncSwarm(); sendConfig();}
+  function setConfig(values) {
+    const previous=config.character;
+    sanitize(values);
+    if (previous!==config.character) {
+      const visible=Boolean(frame); removeFrame(); removeSwarm(); if (visible) showFrame();
+    }
+    persist(); ui(); syncSwarm(); sendConfig();
+  }
   function setPanel(open) {
     $('panel').hidden=!open; $('settings').setAttribute('aria-expanded',String(open));
     $('settings').classList.toggle('active',open);
@@ -77,8 +91,8 @@
   function removeFrame() {frameObserver?.disconnect(); frameObserver=null; frame?.remove(); frame=null;}
   function showFrame() {
     if (frame || !holder) return;
-    frame=document.createElement('iframe'); frame.title='普瑞赛斯坐姿小手办';
-    frame.src=new URL('index.html?embed&v=003',rootURL).href; frame.referrerPolicy='same-origin';
+    frame=document.createElement('iframe'); frame.title=labels[config.character]+'坐姿小手办';
+    frame.src=new URL('index.html?embed&v=004&character='+config.character,rootURL).href; frame.referrerPolicy='same-origin';
     holder.prepend(frame);
     const visibility=()=>{
       if (!frame) return;
@@ -94,7 +108,7 @@
     if (!isHome() || !config.more || !header) {removeSwarm(); return;}
     if (swarm?.isConnected) return;
     removeSwarm(); swarm=document.createElement('iframe'); swarm.id='priestess-chibi-swarm';
-    swarm.title='太空中的小普群'; swarm.src=new URL('swarm.html?v=003',rootURL).href;
+    swarm.title='太空中的小普群'; swarm.src=new URL('swarm.html?v=004&character='+config.character,rootURL).href;
     swarm.referrerPolicy='same-origin'; swarm.tabIndex=-1; header.append(swarm);
     const visibility=()=>{
       if (!swarm) return;
@@ -121,6 +135,8 @@
       <section id="prts-panel" class="prts-panel" aria-label="小普动画设置" hidden>
         <header class="prts-panel-title"><div><small>LITTLE PRIESTESS</small><strong>小普控制室</strong></div><button id="prts-close" type="button" aria-label="关闭小普设置">×</button></header>
         <div class="prts-section">
+          <label class="prts-select"><span>首页角色</span><select id="prts-character" aria-label="首页角色"><option value="smile">笑小普</option><option value="amiya">阿米娅</option><option value="original">泪眼小普</option></select></label>
+          <div id="prts-ear-options" hidden><label class="prts-switch"><span>耳朵弹动</span><input id="prts-earsEnabled" type="checkbox"></label><label class="prts-slider"><span>耳朵摆幅 <output id="prts-earStrength-value"></output></span><input id="prts-earStrength" type="range" min="0" max="1.5" step="0.05" aria-label="耳朵摆幅"></label></div>
           <label class="prts-switch"><span>自动旋转</span><input id="prts-playing" type="checkbox"></label>
           <label class="prts-slider"><span>旋转速度 <output id="prts-period-value"></output></span><input id="prts-period" type="range" min="0.8" max="12" step="0.1" aria-label="旋转一圈秒数"><small>秒数越小，转得越快</small></label>
           <label class="prts-switch"><span>Q弹形变</span><input id="prts-elastic" type="checkbox"></label>
@@ -130,7 +146,7 @@
         <label class="prts-switch prts-more"><span>我们需要更多小普<small>让小普飞进头图的星海</small></span><input id="prts-more" type="checkbox"></label>
         <details id="prts-more-options" class="prts-more-options" open hidden>
           <summary>太空飞行设置</summary>
-          <label class="prts-slider"><span>普瑞赛斯数量 <output id="prts-count-value"></output></span><input id="prts-count" type="range" min="2" max="36" step="1" aria-label="普瑞赛斯数量"></label>
+          <label class="prts-slider"><span>角色数量 <output id="prts-count-value"></output></span><input id="prts-count" type="range" min="2" max="36" step="1" aria-label="角色数量"></label>
           <label class="prts-slider"><span>整体大小 <output id="prts-size-value"></output></span><input id="prts-size" type="range" min="0.5" max="1.8" step="0.1" aria-label="小普整体大小"></label>
           <label class="prts-slider"><span>飞行速度 <output id="prts-speed-value"></output></span><input id="prts-speed" type="range" min="0.2" max="3" step="0.1" aria-label="小普飞行速度"></label>
           <label class="prts-select"><span>弹跳状态</span><select id="prts-motion" aria-label="小普弹跳状态"><option value="bounce">漂浮 + Q弹</option><option value="drift">仅漂浮</option><option value="still">原地 Q弹</option></select></label>
@@ -142,7 +158,7 @@
       </section>`;
     document.body.append(holder);
     const updateVisibility=visible=>{
-      $('visible').textContent=visible ? '小普 · 收起' : '小普 · 展开';
+      $('visible').textContent=`${labels[config.character]} · ${visible ? '收起' : '展开'}`;
       $('visible').setAttribute('aria-label',visible ? '收起小普手办' : '展开小普手办');
       $('visible').setAttribute('aria-expanded',String(visible));
       if (visible) showFrame(); else removeFrame();
@@ -154,17 +170,18 @@
     $('settings').addEventListener('click',()=>setPanel($('panel').hidden));
     $('close').addEventListener('click',()=>{setPanel(false); $('settings').focus();});
     $('music').addEventListener('click',toggleMusic);
-    for (const k of ['playing','elastic','more','edges','collide']) $(k).addEventListener('change',e=>setConfig({[k]:e.target.checked}));
-    for (const k of ['period','strength','count','size','speed','restitution','volume']) $(k).addEventListener('input',e=>{
+    for (const k of ['playing','elastic','more','edges','collide','earsEnabled']) $(k).addEventListener('change',e=>setConfig({[k]:e.target.checked}));
+    for (const k of ['period','strength','count','size','speed','restitution','volume','earStrength']) $(k).addEventListener('input',e=>{
       setConfig({[k]:Number(e.target.value)}); if (audio) audio.volume=config.volume;
     });
+    $('character').addEventListener('change',e=>setConfig({character:e.target.value}));
     $('motion').addEventListener('change',e=>setConfig({motion:e.target.value}));
-    $('reset').addEventListener('click',()=>{stopMusic(); config={...defaults,playing:!reduced.matches}; persist(); ui(); syncSwarm(); sendConfig(); $('notice').textContent='已恢复默认设置，音乐保持关闭。';});
+    $('reset').addEventListener('click',()=>{stopMusic(); setConfig({...defaults,playing:!reduced.matches}); $('notice').textContent='已恢复默认设置，音乐保持关闭。';});
     let visible=true; try {visible=localStorage.getItem(visibleKey)!=='false';} catch {}
     ui(); updateVisibility(visible); syncSwarm();
   }
   const stylesheet=document.createElement('link'); stylesheet.rel='stylesheet';
-  stylesheet.href=new URL('home-widget.css?v=003',rootURL).href; document.head.append(stylesheet);
+  stylesheet.href=new URL('home-widget.css?v=004',rootURL).href; document.head.append(stylesheet);
   window.addEventListener('message',e=>{
     if (e.origin!==location.origin) return;
     if (e.source===frame?.contentWindow) {

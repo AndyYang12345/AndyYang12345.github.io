@@ -1,10 +1,14 @@
 import * as THREE from 'three';
+import {clone as cloneSkin} from 'three/addons/utils/SkeletonUtils.js';
+import {attachEarMotion} from './ear-motion.js?v=004';
+import {characters,characterKey} from './characters.js?v=004';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import {stepDiscs, springStep, kick} from './physics.js?v=003';
 
 const canvas = document.getElementById('swarm');
 const status = document.getElementById('swarm-status');
-const config = {playing:!matchMedia('(prefers-reduced-motion: reduce)').matches, elastic:true,
+const selectedCharacter=characterKey(new URLSearchParams(location.search).get('character'));
+const config = {earsEnabled:true,earStrength:1,playing:!matchMedia('(prefers-reduced-motion: reduce)').matches, elastic:true,
   period:2.7, strength:1.15, count:12, size:1, speed:1, edges:true, collide:false,
   restitution:.94, motion:'bounce'};
 let renderer, scene, camera, template, observer, ready = false, destroyed = false;
@@ -35,7 +39,8 @@ function layoutSize() {
 function makeBody() {
   const pivot = new THREE.Group(), turn = new THREE.Group(), rubber = new THREE.Group();
   pivot.add(turn); turn.add(rubber);
-  rubber.add(template.clone(true)); // Geometry, material and the single texture are shared by all copies.
+  const instance=cloneSkin(template); // Geometry/material are shared; skeletons are independent.
+  rubber.add(instance);
   scene.add(pivot);
   const baseSize = .72 + Math.random() * .92;
   const heading = Math.random() * Math.PI * 2;
@@ -43,7 +48,7 @@ function makeBody() {
   const body = {pivot, turn, rubber, baseSize, radius:baseSize * effectiveSize * .55,
     mass:1, x:0, y:0, vx:Math.cos(heading) * velocity, vy:Math.sin(heading) * velocity,
     yaw:Math.random() * Math.PI * 2, spinRate:.7 + Math.random() * .65, cruise:velocity,
-    phase:Math.random(), squash:0, sv:0, pulse:-1, depth:(Math.random() - .5) * 2};
+    ears:selectedCharacter==='amiya' ? attachEarMotion(instance) : null, phase:Math.random(), squash:0, sv:0, pulse:-1, depth:(Math.random() - .5) * 2};
   body.mass = body.radius ** 2;
   for (let attempt = 0; attempt < 80; attempt++) {
     body.x = (Math.random() * 2 - 1) * Math.max(0, bounds.x - body.radius);
@@ -55,7 +60,10 @@ function makeBody() {
 
 function countChanged() {
   if (!ready) return;
-  while (bodies.length > config.count) scene.remove(bodies.pop().pivot);
+  while (bodies.length > config.count) {
+    const old=bodies.pop(); scene.remove(old.pivot);
+    old.pivot.traverse(o=>{if(o.isSkinnedMesh)o.skeleton?.dispose();});
+  }
   layoutSize();
   while (bodies.length < config.count) bodies.push(makeBody());
   layoutSize(); render(); schedule();
@@ -70,10 +78,13 @@ function render() {
     b.pivot.rotation.z = Math.sin(time * .75 + b.phase * 6.28) * .14;
     b.turn.rotation.y = b.yaw;
     b.rubber.scale.set(1 / Math.sqrt(yScale), yScale, 1 / Math.sqrt(yScale));
+    b.ears?.apply(1 / Math.sqrt(yScale),yScale);
   }
   renderer.render(scene, camera);
   // A compact DOM rendering summary supports accessibility/debugging without exposing mesh internals.
   canvas.dataset.count = String(bodies.length);
+  canvas.dataset.character=selectedCharacter;
+  canvas.dataset.earRigCount=String(bodies.filter(b=>b.ears).length);
   canvas.dataset.playing = String(config.playing);
   canvas.dataset.motion = config.motion;
   canvas.dataset.edges = String(config.edges); canvas.dataset.collide = String(config.collide);
@@ -116,6 +127,11 @@ function tick(now) {
     });
     for (const b of bodies) springStep(b, h, config.strength);
   }
+  for (const b of bodies) {
+    const bounceVelocity=elastic ? .72 * Math.sin((time * 2+b.phase)*Math.PI*2) : 0;
+    const flightVelocity=config.motion==='still' ? 0 : b.vy * config.speed;
+    b.ears?.step(dt,bounceVelocity+flightVelocity,config.earsEnabled ? 'follow' : 'rest',config.earStrength);
+  }
   render(); if (canAnimate()) raf=requestAnimationFrame(tick);
 }
 
@@ -135,7 +151,9 @@ function resize() {
 function configure(input) {
   if (!input || typeof input !== 'object') return;
   const previousCount=config.count;
-  for (const k of ['playing','elastic','edges','collide']) if (typeof input[k] === 'boolean') config[k]=input[k];
+  for (const k of ['playing','elastic','edges','collide','earsEnabled']) if (typeof input[k] === 'boolean') config[k]=input[k];
+  config.earStrength=clamp(input.earStrength,0,1.5,config.earStrength);
+  if (!config.earsEnabled) for(const b of bodies)b.ears?.setPose('rest');
   config.period=clamp(input.period,.8,12,config.period);
   config.strength=clamp(input.strength,.3,1.8,config.strength);
   config.count=Math.round(clamp(input.count,2,36,config.count));
@@ -155,6 +173,7 @@ function onMessage(e) {
 }
 function dispose() {
   if (destroyed) return; destroyed=true; cancelAnimationFrame(raf); observer?.disconnect();
+  for(const b of bodies)b.pivot.traverse(o=>{if(o.isSkinnedMesh)o.skeleton?.dispose();});
   disposeModel(template); renderer?.dispose(); bodies=[];
   window.removeEventListener('message',onMessage);
 }
@@ -173,7 +192,7 @@ async function init() {
   const key=new THREE.DirectionalLight(0xfff5e8,3.1); key.position.set(-3,5,8); scene.add(key);
   const rim=new THREE.DirectionalLight(0xe7ddff,1.7); rim.position.set(3,3,-3); scene.add(rim);
   resize();
-  const gltf=await new GLTFLoader().loadAsync(new URL('./assets/priestess-seated-v002.glb',import.meta.url).href);
+  const gltf=await new GLTFLoader().loadAsync(new URL('./assets/'+characters[selectedCharacter].file,import.meta.url).href);
   if (destroyed) {disposeModel(gltf.scene); return;}
   const box=new THREE.Box3().setFromObject(gltf.scene), size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
   if (!(size.y>0)) throw new Error('Invalid model bounds');
